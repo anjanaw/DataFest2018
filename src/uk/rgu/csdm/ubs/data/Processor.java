@@ -38,116 +38,94 @@ public class Processor
   public double[][] processFrame(String frameString)
   {
     double[][] returnData = new double[16][16];
-    if (frameString == null || frameString.length() != 1737 || !frameString.startsWith(START_FRAME))
-    {
-      return returnData;
-    }
-    frameString = frameString.replace(START_FRAME, EMPTY);
-    String[] splitFrom4D = frameString.split(START_ROW);
-    splitFrom4D = Arrays.copyOfRange(splitFrom4D, 1, 17);
-    if (splitFrom4D.length != 16)
-    {
-      return returnData;
-    }
+    if (frameString != null && frameString.length() == 1737) {
+      frameString = frameString.toUpperCase().replace(START_FRAME, EMPTY);
+      String[] splitFrom4D = frameString.split(START_ROW);
+      if(splitFrom4D.length == 17) {
+        splitFrom4D = Arrays.copyOfRange(splitFrom4D, 1, 17);
 
-    for (int i = 0; i < splitFrom4D.length; i++)
-    {
-      System.out.println(splitFrom4D[i]);
-      returnData[i] = processRow(splitFrom4D[i].replace(ROWS[i], "").replace(END_ROW, ""));
+          for (int i = 0; i < splitFrom4D.length; i++) {
+            returnData[i] = processRow(splitFrom4D[i].replace(ROWS[i], EMPTY).replace(END_ROW, EMPTY));
+          }
+
+      }
     }
-
-    double[][] up = upsample(returnData, 1);
-
-    return up;
+    return upsample(returnData, 4);
   }
 
   public double[] processRow(String rowString)
   {
     double[] row = new double[16];
-    String[] splitFromSpace = rowString.split(SPACE, -1);
-    splitFromSpace = Arrays.copyOfRange(splitFromSpace, 0, 32);
+    if(rowString.length() == 96) {
+      String[] splitFromSpace = rowString.split(SPACE, -1);
+      if (splitFromSpace.length == 33) {
+        splitFromSpace = Arrays.copyOfRange(splitFromSpace, 0, 32);
 
-    int column = 0;
-    for (int i = 1; i < splitFromSpace.length; i += 2)
-    {
-      String value = splitFromSpace[i] + splitFromSpace[i - 1];
-      row[column++] = THRESHOLD - Long.parseLong(value, 16);
+        int column = 0;
+        for (int i = 1; i < splitFromSpace.length; i += 2) {
+          String value = splitFromSpace[i] + splitFromSpace[i - 1];
+          row[column++] = THRESHOLD - Long.parseLong(value, 16);
+        }
+      }
     }
     return row;
   }
 
   public double[][] upsample(double[][] matrix, int times)
   {
-    int newi = matrix.length*2;
-    int newj = matrix[0].length*2;
-    double[][] upsampledMatrix = new double[newi][newj];
-
-    for (int i = 0; i < newi; i++)
+    for(int k=0; k<times; k++)
     {
-      for (int j = 0; j < newj; j++)
-      {
-        if(i%2==0 && j%2==0)
-        {
-          upsampledMatrix[i][j] = matrix[i/2][j/2];
-        }
-      }
-    }
+      int newi = matrix.length*2;
+      int newj = matrix[0].length*2;
+      double[][] upsampledMatrix = new double[newi][newj];
 
-    for (int i = 0; i < newi; i++)
-    {
-      for (int j = 0; j < newj; j++)
-      {
-        if (j % 2 == 1 && i%2 == 0)
-        {
-          if (j < newj-1)
-          {
-            upsampledMatrix[i][j] = (upsampledMatrix[i][j - 1] + upsampledMatrix[i][j + 1]) / 2;
-          }
-          else if (j == newj-1)
-          {
-            upsampledMatrix[i][j] = upsampledMatrix[i][j - 1] / 2;
+      for (int i = 0; i < newi; i++) {
+        for (int j = 0; j < newj; j++) {
+          if (i % 2 == 0 && j % 2 == 0) {
+            upsampledMatrix[i][j] = matrix[i / 2][j / 2];
           }
         }
       }
-    }
 
-    for (int i = 0; i < newi; i++)
-    {
-      for (int j = 0; j < newj; j++)
-      {
-        if (i % 2 == 1 && j%2 == 0)
-        {
-          if (i < newi-1)
-          {
-            upsampledMatrix[i][j] = (upsampledMatrix[i-1][j] + upsampledMatrix[i+1][j]) / 2;
+      for (int i = 0; i < newi; i++) {
+        for (int j = 0; j < newj; j++) {
+          if (j % 2 == 1 && i % 2 == 0) {
+            if (j < newj - 1) {
+              upsampledMatrix[i][j] = (upsampledMatrix[i][j - 1] + upsampledMatrix[i][j + 1]) / 2;
+            } else if (j == newj - 1) {
+              upsampledMatrix[i][j] = upsampledMatrix[i][j - 1] / 2;
+            }
           }
-          else if (i == newi-1)
-          {
-            upsampledMatrix[i][j] = upsampledMatrix[i-1][j] / 2;
+          if (i % 2 == 1 && j % 2 == 0) {
+            if (i < newi - 1) {
+              upsampledMatrix[i][j] = (upsampledMatrix[i - 1][j] + upsampledMatrix[i + 1][j]) / 2;
+            } else if (i == newi - 1) {
+              upsampledMatrix[i][j] = upsampledMatrix[i - 1][j] / 2;
+            }
           }
         }
       }
-    }
 
-    for (int i = 0; i < newi; i++)
-    {
-      for (int j = 0; j < newj; j++)
-      {
-        if (j % 2 == 1 && i%2 == 1)
-        {
-          if (j < newj-1)
-          {
-            upsampledMatrix[i][j] = (upsampledMatrix[i][j - 1] + upsampledMatrix[i][j + 1]) / 2;
-          }
-          else if (j == newj-1)
-          {
-            upsampledMatrix[i][j] = upsampledMatrix[i][j - 1] / 2;
+      for (int i = 0; i < newi; i++) {
+        for (int j = 0; j < newj; j++) {
+          if (j % 2 == 1 && i % 2 == 1) {
+            if (j < newj - 1) {
+              upsampledMatrix[i][j] = (upsampledMatrix[i][j - 1] + upsampledMatrix[i][j + 1]) / 2;
+            } else if (j == newj - 1) {
+              upsampledMatrix[i][j] = upsampledMatrix[i][j - 1] / 2;
+            }
           }
         }
       }
+      matrix = upsampledMatrix;
     }
+    return matrix;
+  }
 
-    return upsampledMatrix;
+  private double[][] createThreshold()
+  {
+    double[][] test = new double[16][16];
+    return test;
   }
 
 }
