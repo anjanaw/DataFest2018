@@ -35,18 +35,26 @@ public class Processor
     return instance;
   }
 
+  public double[][] processFrame(String frameString1, String frameString2)
+  {
+    return null;
+  }
+
   public double[][] processFrame(String frameString)
   {
     double[][] returnData = new double[16][16];
-    if (frameString != null && frameString.length() == 1737) {
+    if (frameString != null && frameString.length() == 1737)
+    {
       frameString = frameString.toUpperCase().replace(START_FRAME, EMPTY);
       String[] splitFrom4D = frameString.split(START_ROW);
-      if(splitFrom4D.length == 17) {
+      if (splitFrom4D.length == 17)
+      {
         splitFrom4D = Arrays.copyOfRange(splitFrom4D, 1, 17);
 
-          for (int i = 0; i < splitFrom4D.length; i++) {
-            returnData[i] = processRow(splitFrom4D[i].replace(ROWS[i], EMPTY).replace(END_ROW, EMPTY));
-          }
+        for (int i = 0; i < splitFrom4D.length; i++)
+        {
+          returnData[i] = processRow(splitFrom4D[i].replace(ROWS[i], EMPTY).replace(END_ROW, EMPTY));
+        }
 
       }
     }
@@ -56,13 +64,15 @@ public class Processor
   public double[] processRow(String rowString)
   {
     double[] row = new double[16];
-    if(rowString.length() == 96) {
+    if (rowString.length() == 96)
+    {
       String[] splitFromSpace = rowString.split(SPACE, -1);
-      if (splitFromSpace.length == 33) {
+      if (splitFromSpace.length == 33)
+      {
         splitFromSpace = Arrays.copyOfRange(splitFromSpace, 0, 32);
-
         int column = 0;
-        for (int i = 1; i < splitFromSpace.length; i += 2) {
+        for (int i = 1; i < splitFromSpace.length; i += 2)
+        {
           String value = splitFromSpace[i] + splitFromSpace[i - 1];
           row[column++] = THRESHOLD - Long.parseLong(value, 16);
         }
@@ -73,45 +83,64 @@ public class Processor
 
   public double[][] upsample(double[][] matrix, int times)
   {
-    for(int k=0; k<times; k++)
+    for (int k = 0; k < times; k++)
     {
-      int newi = matrix.length*2;
-      int newj = matrix[0].length*2;
+      int newi = matrix.length * 2;
+      int newj = matrix[0].length * 2;
       double[][] upsampledMatrix = new double[newi][newj];
 
-      for (int i = 0; i < newi; i++) {
-        for (int j = 0; j < newj; j++) {
-          if (i % 2 == 0 && j % 2 == 0) {
+      for (int i = 0; i < newi; i++)
+      {
+        for (int j = 0; j < newj; j++)
+        {
+          if (i % 2 == 0 && j % 2 == 0)
+          {
             upsampledMatrix[i][j] = matrix[i / 2][j / 2];
           }
         }
       }
 
-      for (int i = 0; i < newi; i++) {
-        for (int j = 0; j < newj; j++) {
-          if (j % 2 == 1 && i % 2 == 0) {
-            if (j < newj - 1) {
+      for (int i = 0; i < newi; i++)
+      {
+        for (int j = 0; j < newj; j++)
+        {
+          if (j % 2 == 1 && i % 2 == 0)
+          {
+            if (j < newj - 1)
+            {
               upsampledMatrix[i][j] = (upsampledMatrix[i][j - 1] + upsampledMatrix[i][j + 1]) / 2;
-            } else if (j == newj - 1) {
+            }
+            else if (j == newj - 1)
+            {
               upsampledMatrix[i][j] = upsampledMatrix[i][j - 1] / 2;
             }
           }
-          if (i % 2 == 1 && j % 2 == 0) {
-            if (i < newi - 1) {
+          if (i % 2 == 1 && j % 2 == 0)
+          {
+            if (i < newi - 1)
+            {
               upsampledMatrix[i][j] = (upsampledMatrix[i - 1][j] + upsampledMatrix[i + 1][j]) / 2;
-            } else if (i == newi - 1) {
+            }
+            else if (i == newi - 1)
+            {
               upsampledMatrix[i][j] = upsampledMatrix[i - 1][j] / 2;
             }
           }
         }
       }
 
-      for (int i = 0; i < newi; i++) {
-        for (int j = 0; j < newj; j++) {
-          if (j % 2 == 1 && i % 2 == 1) {
-            if (j < newj - 1) {
+      for (int i = 0; i < newi; i++)
+      {
+        for (int j = 0; j < newj; j++)
+        {
+          if (j % 2 == 1 && i % 2 == 1)
+          {
+            if (j < newj - 1)
+            {
               upsampledMatrix[i][j] = (upsampledMatrix[i][j - 1] + upsampledMatrix[i][j + 1]) / 2;
-            } else if (j == newj - 1) {
+            }
+            else if (j == newj - 1)
+            {
               upsampledMatrix[i][j] = upsampledMatrix[i][j - 1] / 2;
             }
           }
