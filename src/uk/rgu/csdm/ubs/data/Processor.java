@@ -149,7 +149,7 @@ public class Processor
 
       }
     }
-    return returnData;
+    return rotate(returnData);
   }
 
   public double[] processRow(String rowString)
@@ -242,4 +242,15 @@ public class Processor
     return matrix;
   }
 
+  private double[][] rotate(double[][] matrix)
+  {
+    int n = matrix.length;
+    double[][] newMatrix = new double[matrix[0].length][matrix.length];
+    for (int i = 0; i < matrix.length; i++) {
+      for (int j = 0; j < matrix[0].length; j++) {
+        newMatrix[i][j] = matrix[n - j - 1][i];
+      }
+    }
+    return newMatrix;
+  }
 }
