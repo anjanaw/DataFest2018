@@ -1,6 +1,6 @@
-package uk.rgu.csdm.ubs.data;
+package uk.rgu.csdm.ubs;
 
-import uk.rgu.csdm.ubs.heat.HeatMapDemo;
+import uk.rgu.csdm.ubs.view.HeatMapFrame;
 
 import javax.swing.*;
 
@@ -9,9 +9,9 @@ public class Main
 
   private static void createAndShowGUI() throws Exception
   {
-    HeatMapDemo hmd = new HeatMapDemo();
+    HeatMapFrame hmd = new HeatMapFrame();
     hmd.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    hmd.setSize(800, 600);
+    hmd.setSize(1200, 600);
     hmd.setVisible(true);
   }
 
