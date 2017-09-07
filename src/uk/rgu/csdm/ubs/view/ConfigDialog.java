@@ -85,29 +85,27 @@ public class ConfigDialog extends JDialog implements Constants
 
     this.contentPanel.add(leftInput,
         new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
-            new Insets(0, 0, 0, 0), 0, 0));
+            new Insets(5, 5, 5, 5), 0, 0));
 
     this.contentPanel.add(leftCombo,
         new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
-            new Insets(0, 0, 0, 0), 0, 0));
+            new Insets(5, 5, 5, 5), 0, 0));
 
     this.contentPanel.add(rightInput,
         new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
-            new Insets(0, 0, 0, 0), 0, 0));
+            new Insets(5, 5, 5, 5), 0, 0));
 
     this.contentPanel.add(rightCombo,
         new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
-            new Insets(0, 0, 0, 0), 0, 0));
+            new Insets(5, 5, 5, 5), 0, 0));
 
     this.contentPanel.add(startButton,
         new GridBagConstraints(0, 2, 1, 1, 0.5, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-            new Insets(0, 0, 0, 0), 0, 0));
+            new Insets(5, 5, 5, 5), 0, 0));
 
     this.contentPanel.add(stopButton,
         new GridBagConstraints(1, 2, 1, 1, 0.5, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE,
-            new Insets(0, 0, 0, 0), 0, 0));
-
-    update();
+            new Insets(5, 5, 5, 5), 0, 0));
   }
 
   private void update()
@@ -116,7 +114,7 @@ public class ConfigDialog extends JDialog implements Constants
     this.leftCombo.setModel(new DefaultComboBoxModel<String>(ports));
     this.rightCombo.setModel(new DefaultComboBoxModel<String>(ports));
 
-    if (configData != null)
+    if (configData.size() != 0)
     {
       boolean isoff = !Boolean.parseBoolean(configData.get(IS_ON));
       this.leftCombo.setSelectedItem(configData.get(LEFT_PORT));

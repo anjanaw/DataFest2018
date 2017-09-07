@@ -74,7 +74,6 @@ public class HeatMapFrame extends JFrame
     ConfigDialog instance = ConfigDialog.getInstance();
     instance.setParent(this);
     instance.showDialog();
-    heatMap.setConfigData(instance.getConfigData());
   }
 
   private void exit()

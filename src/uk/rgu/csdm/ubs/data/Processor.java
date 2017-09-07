@@ -47,7 +47,6 @@ public class Processor
 
     newFrame = upsample(newFrame, 5);
 
-    System.out.println(newFrame.length + " " + newFrame[0].length);
     return newFrame;
   }
 
