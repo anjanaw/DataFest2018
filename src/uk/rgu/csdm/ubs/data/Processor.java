@@ -1,23 +1,10 @@
 package uk.rgu.csdm.ubs.data;
 
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import uk.rgu.csdm.ubs.view.HeatMap;
-
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Processor
 {
   private static Processor instance;
-
-  private Map<String, String> usb1Data = new HashMap();
-
-  private static final String USB1 = "USB1";
-
-  private HeatMap heatMap;
 
   private static final String START_FRAME = "48 00 0A ";
 
@@ -48,86 +35,19 @@ public class Processor
     return instance;
   }
 
-  public void setHeatMap(HeatMap heatMap)
-  {
-    this.heatMap = heatMap;
-  }
-
-  public void connectSerialPort()
-  {
-    try
-    {
-      final SerialPort serialPort1 = new SerialPort("COM5");
-      serialPort1.openPort();
-      serialPort1.addEventListener(new SerialPortEventListener()
-      {
-        @Override public void serialEvent(SerialPortEvent serialPortEvent)
-        {
-          try
-          {
-            byte[] data = serialPort1.readBytes();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : data)
-            {
-              sb.append(String.format("%02x ", b));
-            }
-            usb1Data.put(USB1, sb.toString());
-          }
-          catch (Exception e)
-          {
-            e.printStackTrace();
-          }
-        }
-      });
-
-      final SerialPort serialPort2 = new SerialPort("COM4");
-      serialPort2.openPort();
-      serialPort2.addEventListener(new SerialPortEventListener()
-      {
-        @Override public void serialEvent(SerialPortEvent serialPortEvent)
-        {
-          try
-          {
-            byte[] data = serialPort2.readBytes();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : data)
-            {
-              sb.append(String.format("%02x ", b));
-            }
-            String usb1CurrentData = usb1Data.get(USB1);
-            if(usb1CurrentData == null)
-            {
-              return;
-            }
-            heatMap.updateData(processFrame(usb1CurrentData, sb.toString()));
-          }
-          catch (Exception e)
-          {
-            e.printStackTrace();
-          }
-        }
-      });
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-  }
-
-
   public double[][] processFrame(String frameString1, String frameString2)
   {
     double[][] frame1 = processFrame(frameString1);
     double[][] frame2 = processFrame(frameString2);
 
-    double[][] newFrame = new double[frame1.length*2][];
+    double[][] newFrame = new double[frame1.length * 2][];
 
-      System.arraycopy(frame1, 0, newFrame, 0, frame1.length);
-      System.arraycopy(frame2, 0, newFrame, frame1.length, frame2.length);
+    System.arraycopy(frame1, 0, newFrame, 0, frame1.length);
+    System.arraycopy(frame2, 0, newFrame, frame1.length, frame2.length);
 
-    System.out.println(newFrame.length+" "+newFrame[0].length);
-    newFrame = upsample(newFrame, 4);
-    System.out.println(newFrame.length+" "+newFrame[0].length);
+    newFrame = upsample(newFrame, 5);
+
+    System.out.println(newFrame.length + " " + newFrame[0].length);
     return newFrame;
   }
 
@@ -246,11 +166,14 @@ public class Processor
   {
     int n = matrix.length;
     double[][] newMatrix = new double[matrix[0].length][matrix.length];
-    for (int i = 0; i < matrix.length; i++) {
-      for (int j = 0; j < matrix[0].length; j++) {
+    for (int i = 0; i < matrix.length; i++)
+    {
+      for (int j = 0; j < matrix[0].length; j++)
+      {
         newMatrix[i][j] = matrix[n - j - 1][i];
       }
     }
     return newMatrix;
   }
+
 }

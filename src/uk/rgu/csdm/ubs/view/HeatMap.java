@@ -1,12 +1,19 @@
 package uk.rgu.csdm.ubs.view;
 
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import uk.rgu.csdm.ubs.data.Processor;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.*;
 
-public class HeatMap extends JPanel
+public class HeatMap extends JPanel implements Constants
 {
   private double[][] data;
 
@@ -30,18 +37,20 @@ public class HeatMap extends JPanel
 
   private Graphics2D bufferedGraphics;
 
-  /**
-   * @param data The data to display, must be a complete array (non-ragged)
-   * @param colors A variable of the type Color[].
-   */
-  public HeatMap(double[][] data, Color[] colors)
+  private Map<String, String> configData;
+
+  private Map<String, String> usb1Data = new HashMap();
+
+  public HeatMap()
   {
     super();
 
-    updateGradient(colors);
-    updateData(data);
+    updateGradient(Gradient.GRADIENT_GREEN_YELLOW_ORANGE_RED);
+    updateData(Processor.getInstance().processFrame(
+        "48 00 0A 4D 10 00 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 01 E7 0F F7 0F DF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F F0 0F FF 0F DC 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 02 E4 0F FB 0F E9 0F FF 0F FD 0F FF 0F FF 0F FD 0F FF 0F B2 0F FA 0F DB 0F FD 0F FC 0F FF 0F F9 0F 0A 4D 10 03 F8 0F FF 0F F8 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F EC 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 04 FB 0F FF 0F FA 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F DF 0F F8 0F CB 0F F1 0F F6 0F FF 0F F4 0F 0A 4D 10 05 EA 0F FB 0F EB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F F7 0F FF 0F F6 0F FD 0F FD 0F FF 0F FC 0F 0A 4D 10 06 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 07 99 0F F9 0F E9 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F EB 0F F6 0F C2 0F FA 0F FC 0F FF 0F F7 0F 0A 4D 10 08 55 0F F0 0F CA 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F F1 0F FC 0F F6 0F FF 0F FF 0F FF 0F FC 0F 0A 4D 10 09 92 0F F2 0F C1 0F FF 0F F1 0F FF 0F FF 0F FD 0F FF 0F CE 0F E1 0F D5 0F F8 0F FA 0F FF 0F ED 0F 0A 4D 10 0A E8 0F FD 0F F2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0B DB 0F FF 0F F8 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0C FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0D F1 0F FF 0F FB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0E FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0F D6 0F FD 0F E2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FC 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F 0A ",
+        "48 00 0A 4D 10 00 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 01 E7 0F F7 0F DF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F F0 0F FF 0F DC 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 02 E4 0F FB 0F E9 0F FF 0F FD 0F FF 0F FF 0F FD 0F FF 0F B2 0F FA 0F DB 0F FD 0F FC 0F FF 0F F9 0F 0A 4D 10 03 F8 0F FF 0F F8 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F EC 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 04 FB 0F FF 0F FA 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F DF 0F F8 0F CB 0F F1 0F F6 0F FF 0F F4 0F 0A 4D 10 05 EA 0F FB 0F EB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F F7 0F FF 0F F6 0F FD 0F FD 0F FF 0F FC 0F 0A 4D 10 06 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 07 99 0F F9 0F E9 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F EB 0F F6 0F C2 0F FA 0F FC 0F FF 0F F7 0F 0A 4D 10 08 55 0F F0 0F CA 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F F1 0F FC 0F F6 0F FF 0F FF 0F FF 0F FC 0F 0A 4D 10 09 92 0F F2 0F C1 0F FF 0F F1 0F FF 0F FF 0F FD 0F FF 0F CE 0F E1 0F D5 0F F8 0F FA 0F FF 0F ED 0F 0A 4D 10 0A E8 0F FD 0F F2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0B DB 0F FF 0F F8 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0C FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0D F1 0F FF 0F FB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0E FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0F D6 0F FD 0F E2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FC 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F 0A "));
 
-    this.setPreferredSize(new Dimension(60 + data.length, 60 + data[0].length));
+    this.setPreferredSize(new Dimension(60 + 1024, 60 + 512));
     this.setDoubleBuffered(true);
 
     this.bg = Color.white;
@@ -221,6 +230,111 @@ public class HeatMap extends JPanel
       yStart = height - 31 - y;
       g2d.setColor(colors[(int) ((y / (double) (height - 60)) * (colors.length * 1.0))]);
       g2d.fillRect(width - 19, yStart, 9, 1);
+    }
+  }
+
+  public Map<String, String> getConfigData()
+  {
+    return configData;
+  }
+
+  public void setConfigData(Map<String, String> configData)
+  {
+    this.configData = configData;
+  }
+
+  public void connectSerialPort(String leftPort, String rightPort)
+  {
+    try
+    {
+      final SerialPort serialPort1 = new SerialPort(leftPort);
+      serialPort1.openPort();
+      serialPort1.addEventListener(new LeftPortListener(serialPort1));
+
+      final SerialPort serialPort2 = new SerialPort(rightPort);
+      serialPort2.openPort();
+      serialPort2.addEventListener(new RightPortListener(serialPort2));
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private void disconnectSerialPort(String leftPort, String rightPort)
+  {
+    try
+    {
+      final SerialPort serialPort1 = new SerialPort(leftPort);
+      serialPort1.closePort();
+
+      final SerialPort serialPort2 = new SerialPort(rightPort);
+      serialPort2.closePort();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  private class LeftPortListener implements SerialPortEventListener
+  {
+    private SerialPort port;
+
+    public LeftPortListener(SerialPort port)
+    {
+      this.port = port;
+    }
+
+    @Override public void serialEvent(SerialPortEvent serialPortEvent)
+    {
+      try
+      {
+        byte[] data = port.readBytes();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : data)
+        {
+          sb.append(String.format("%02x ", b));
+        }
+        usb1Data.put(USB1, sb.toString());
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private class RightPortListener implements SerialPortEventListener
+  {
+    private SerialPort port;
+
+    public RightPortListener(SerialPort port)
+    {
+      this.port = port;
+    }
+
+    @Override public void serialEvent(SerialPortEvent serialPortEvent)
+    {
+      try
+      {
+        byte[] data = port.readBytes();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : data)
+        {
+          sb.append(String.format("%02x ", b));
+        }
+        String usb1CurrentData = usb1Data.get(USB1);
+        if (usb1CurrentData == null)
+        {
+          return;
+        }
+        updateData(Processor.getInstance().processFrame(usb1CurrentData, sb.toString()));
+      }
+      catch (Exception e)
+      {
+        e.printStackTrace();
+      }
     }
   }
 }

@@ -1,26 +1,89 @@
 package uk.rgu.csdm.ubs.view;
 
-import uk.rgu.csdm.ubs.data.Processor;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class HeatMapFrame extends JFrame
 {
   private HeatMap heatMap;
 
+  private JMenuBar menuBar;
+
+  private JMenu menu;
+
+  private JMenuItem fullScreen;
+
+  private JMenuItem configure;
+
+  private JMenuItem exit;
+
   public HeatMapFrame() throws Exception
   {
     super("Pressure Mat");
 
-    this.heatMap = new HeatMap(Processor.getInstance().processFrame(
-        "48 00 0A 4D 10 00 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 01 E7 0F F7 0F DF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F F0 0F FF 0F DC 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 02 E4 0F FB 0F E9 0F FF 0F FD 0F FF 0F FF 0F FD 0F FF 0F B2 0F FA 0F DB 0F FD 0F FC 0F FF 0F F9 0F 0A 4D 10 03 F8 0F FF 0F F8 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F EC 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 04 FB 0F FF 0F FA 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F DF 0F F8 0F CB 0F F1 0F F6 0F FF 0F F4 0F 0A 4D 10 05 EA 0F FB 0F EB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F F7 0F FF 0F F6 0F FD 0F FD 0F FF 0F FC 0F 0A 4D 10 06 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 07 99 0F F9 0F E9 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F EB 0F F6 0F C2 0F FA 0F FC 0F FF 0F F7 0F 0A 4D 10 08 55 0F F0 0F CA 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F F1 0F FC 0F F6 0F FF 0F FF 0F FF 0F FC 0F 0A 4D 10 09 92 0F F2 0F C1 0F FF 0F F1 0F FF 0F FF 0F FD 0F FF 0F CE 0F E1 0F D5 0F F8 0F FA 0F FF 0F ED 0F 0A 4D 10 0A E8 0F FD 0F F2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0B DB 0F FF 0F F8 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0C FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0D F1 0F FF 0F FB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0E FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0F D6 0F FD 0F E2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FC 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F 0A ",
-        "48 00 0A 4D 10 00 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 01 E7 0F F7 0F DF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F F0 0F FF 0F DC 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 02 E4 0F FB 0F E9 0F FF 0F FD 0F FF 0F FF 0F FD 0F FF 0F B2 0F FA 0F DB 0F FD 0F FC 0F FF 0F F9 0F 0A 4D 10 03 F8 0F FF 0F F8 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F EC 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 04 FB 0F FF 0F FA 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F DF 0F F8 0F CB 0F F1 0F F6 0F FF 0F F4 0F 0A 4D 10 05 EA 0F FB 0F EB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F F7 0F FF 0F F6 0F FD 0F FD 0F FF 0F FC 0F 0A 4D 10 06 FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 07 99 0F F9 0F E9 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F EB 0F F6 0F C2 0F FA 0F FC 0F FF 0F F7 0F 0A 4D 10 08 55 0F F0 0F CA 0F FF 0F F9 0F FF 0F FF 0F FF 0F FF 0F F1 0F FC 0F F6 0F FF 0F FF 0F FF 0F FC 0F 0A 4D 10 09 92 0F F2 0F C1 0F FF 0F F1 0F FF 0F FF 0F FD 0F FF 0F CE 0F E1 0F D5 0F F8 0F FA 0F FF 0F ED 0F 0A 4D 10 0A E8 0F FD 0F F2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0B DB 0F FF 0F F8 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0C FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0D F1 0F FF 0F FB 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0E FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F 0A 4D 10 0F D6 0F FD 0F E2 0F FF 0F FF 0F FF 0F FF 0F FF 0F FF 0F FC 0F FF 0F FD 0F FF 0F FF 0F FF 0F FF 0F 0A "),
-        Gradient.GRADIENT_GREEN_YELLOW_ORANGE_RED);
+    this.heatMap = new HeatMap();
+
+    this.menu = new JMenu("Preferences");
+    this.fullScreen = new JMenuItem("Enter full screen");
+    this.fullScreen.addActionListener(new ActionListener()
+    {
+      @Override public void actionPerformed(ActionEvent e)
+      {
+        enterFullScreen();
+      }
+    });
+    this.configure = new JMenuItem("Configuration");
+    this.configure.addActionListener(new ActionListener()
+    {
+      @Override public void actionPerformed(ActionEvent e)
+      {
+        configure();
+      }
+    });
+    this.exit = new JMenuItem("Exit");
+    this.exit.addActionListener(new ActionListener()
+    {
+      @Override public void actionPerformed(ActionEvent e)
+      {
+        exit();
+      }
+    });
+
+    this.menu.add(configure);
+    this.menu.add(fullScreen);
+    this.menu.add(exit);
+
+    this.menuBar = new JMenuBar();
+    this.menuBar.add(menu);
+
+    this.setJMenuBar(menuBar);
 
     this.getContentPane().add(heatMap, BorderLayout.CENTER);
+  }
 
-    Processor.getInstance().setHeatMap(heatMap);
-    //Processor.getInstance().connectSerialPort();
+  private void enterFullScreen()
+  {
+    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+    this.setVisible(true);
+  }
+
+  private void configure()
+  {
+    ConfigDialog instance = ConfigDialog.getInstance();
+    instance.setParent(this);
+    instance.showDialog();
+    heatMap.setConfigData(instance.getConfigData());
+  }
+
+  private void exit()
+  {
+    dispose();
+  }
+
+  public HeatMap getHeatMap()
+  {
+    return this.heatMap;
   }
 }
