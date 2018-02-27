@@ -1,6 +1,12 @@
 package uk.rgu.csdm.ubs.data;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Processor
 {
@@ -19,6 +25,8 @@ public class Processor
 
   private static final String SPACE = " ";
 
+  private static final String FILE = "C:/IdeaProjects/1210.csv";
+
   private static final double THRESHOLD = 4095;
 
   private Processor()
@@ -35,6 +43,40 @@ public class Processor
     return instance;
   }
 
+  public double[][] processFrame()
+  {
+    try
+    {
+      BufferedReader br = new BufferedReader(new FileReader(FILE));
+      String str;
+      double[][] frame = new double[32][];
+      int j=0;
+      while ((str = br.readLine()) != null)
+      {
+        String[] strr = str.split(",");
+        double[] line = new double[16];
+        int i=0;
+        for(String temp : strr)
+        {
+          line[i++] = Double.parseDouble(temp);
+        }
+        frame[j++] = line;
+        if(j == 32)
+        {
+          frame = upsample(frame, 5);
+          System.out.println(frame[0].length);
+          System.out.println(frame.length);
+          return frame;
+        }
+      }
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   public double[][] processFrame(String frameString1, String frameString2)
   {
     double[][] frame1 = processFrame(frameString1);
@@ -45,10 +87,49 @@ public class Processor
     System.arraycopy(frame1, 0, newFrame, 0, frame1.length);
     System.arraycopy(frame2, 0, newFrame, frame1.length, frame2.length);
 
+    Counter.getInstance().add(convert(newFrame));
     newFrame = upsample(newFrame, 5);
-
     return newFrame;
   }
+
+  private Double[][] convert(double[][] input)
+  {
+    List<Double[]> output = new ArrayList<>();
+    for(double[] dd : input)
+    {
+      List<Double> o = new ArrayList<>();
+      for(double d:dd)
+      {
+        o.add(d);
+      }
+      output.add(o.toArray(new Double[0]));
+    }
+    return output.toArray(new Double[0][]);
+  }
+
+  /*private void writeFile(double[][] frame)
+  {
+    try
+    {
+      BufferedWriter writer = new BufferedWriter(new FileWriter(FILE, true));
+      for(double[] line : frame)
+      {
+        StringBuilder s = new StringBuilder();
+        for(double temp : line)
+        {
+          s.append(temp);
+          s.append(",");
+        }
+        writer.append(s.toString().substring(0, s.length()-1));
+        writer.append("\n");
+      }
+      writer.close();
+    }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+    }
+  }*/
 
   public double[][] processFrame(String frameString)
   {

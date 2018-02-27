@@ -63,6 +63,11 @@ public class HeatMapFrame extends JFrame
     this.getContentPane().add(heatMap, BorderLayout.CENTER);
   }
 
+  public void setData()
+  {
+    this.heatMap.setConfigData(null);
+  }
+
   private void enterFullScreen()
   {
     this.setExtendedState(JFrame.MAXIMIZED_BOTH);

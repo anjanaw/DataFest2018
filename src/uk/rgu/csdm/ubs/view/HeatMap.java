@@ -244,7 +244,7 @@ public class HeatMap extends JPanel implements Constants
 
   public void setConfigData(Map<String, String> configData)
   {
-    this.configData = configData;
+    /*this.configData = configData;
     if(Boolean.parseBoolean(configData.get(IS_ON)))
     {
       String left = configData.get(LEFT_PORT);
@@ -254,12 +254,13 @@ public class HeatMap extends JPanel implements Constants
     else
     {
       disconnectSerialPort();
-    }
+    }*/
+    updateData(Processor.getInstance().processFrame());
   }
 
   public void connectSerialPort(String leftPort, String rightPort)
   {
-    try
+    /*try
     {
       serialPortLeft = new SerialPort(leftPort);
       serialPortLeft.openPort();
@@ -272,7 +273,8 @@ public class HeatMap extends JPanel implements Constants
     catch (Exception e)
     {
       e.printStackTrace();
-    }
+    }*/
+
   }
 
   private void disconnectSerialPort()
