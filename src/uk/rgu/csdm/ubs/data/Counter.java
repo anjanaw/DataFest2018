@@ -1,5 +1,7 @@
 package uk.rgu.csdm.ubs.data;
 
+import uk.rgu.csdm.ubs.tts.TTS;
+
 import java.util.*;
 
 public class Counter {
@@ -151,7 +153,7 @@ public class Counter {
             List<Double> subset = diff_queue.subList(index-15, index+15);
             if(test == Collections.max(subset)) {
                 count++;
-                System.out.println(count);
+                TTS.getInstance().speak(""+count);
             }
         }
     }
