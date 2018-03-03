@@ -1,9 +1,7 @@
 package uk.rgu.csdm.ubs.data;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +12,7 @@ public class Test
         BufferedReader br;
         try
         {
-            br = new BufferedReader(new FileReader("C:/IdeaProjects/Data/data/step/19021620201802191616.csv"));
+            br = new BufferedReader(new FileReader("C:/IdeaProjects/Data/data/step/19021620201803011146.csv"));
             String line;
             List<Double[]> data = new ArrayList<>();
             while ((line = br.readLine()) != null)
@@ -28,8 +26,8 @@ public class Test
                 data.add(item.toArray(new Double[0]));
                 if(data.size() == 32)
                 {
-                    Counter.getInstance().add(data.toArray(new Double[0][]));
-                    Thread.sleep(40);
+                    PeakCounter.getInstance().add(data.toArray(new Double[0][]));
+                    //Thread.sleep(40);
                     data = new ArrayList<>();
                 }
             }

@@ -2,11 +2,12 @@ package uk.rgu.csdm.ubs.data;
 
 import java.util.*;
 
-public class Counter {
-    private static Counter instance;
+public class PeakCounter {
+    private static PeakCounter instance;
 
-    private static Queue<Double[][]> queue = new LinkedList<>();
+    private static List<Double[][]> queue = new LinkedList<>();
     private static int count = 0;
+    private static int incoming_count = 0;
 
     private static final int WINDOW = 60;
     private static final int SMOOTHING_WINDOW = 10;
@@ -26,14 +27,21 @@ public class Counter {
             0.005573202838827839,0.005644745879120879,0.006082112332112332,0.006358268467643468,0.005323756105006105,0.00879407512820513,0.004516750610500611,
             0.003415941697191697,0.004768582112332113,0.0011537507631257631,4.3021214896214895E-4,4.2830433455433455E-4,4.826770451770452E-4};
 
-    public static Counter getInstance() {
+    /*private static final double[] n_template_half = {0.003081597222222222,0.005934733669108669,1.7313415750915752E-4,2.442002442002442E-4,0.004454746642246642,
+            2.3179945054945054E-4,2.1701388888888888-4,0.004524858821733822,0.004507688492063492,1.7647283272283272E-4,0.004072229853479854,0.008112026862026863,
+            0.01101810515873016,0.0077390491452991456,0.006184657356532356,0.00528559981849817,0.005103880494505495,0.006348252442002442,0.005926625457875458,
+            0.005573202838827839,0.005644745879120879,0.006082112332112332,0.006358268467643468,0.005323756105006105,0.00879407512820513,0.004516750610500611,
+            0.003415941697191697,0.004768582112332113,0.0011537507631257631,4.3021214896214895E-4,4.2830433455433455E-4,4.826770451770452E-4};*/
+
+    public static PeakCounter getInstance()
+    {
         if (instance == null) {
-            instance = new Counter();
+            instance = new PeakCounter();
         }
         return instance;
     }
 
-    private Counter()
+    private PeakCounter()
     {
         for(int i=0; i<59; i++)
         {
@@ -59,34 +67,11 @@ public class Counter {
     public void add(Double[][] incoming)
     {
         queue.add(incoming);
+        incoming_count++;
         if(queue.size() == 60)
         {
             count();
         }
-    }
-
-    private double sum(List<Double> input)
-    {
-        double sum = 0;
-        for(Double dd : input)
-        {
-            sum+=dd;
-        }
-        return sum;
-    }
-
-    private double sd(List<Double> input, double mean)
-    {
-        double sum = 0.0;
-        for(Double dd : input)
-        {
-            double dif = dd - mean;
-            sum += Math.pow(dif, 2);
-        }
-
-        double div = sum / input.size();
-
-        return Math.sqrt(div);
     }
 
     private List<Double> normalise(List<Double> input)
@@ -95,16 +80,6 @@ public class Counter {
         for(Double dd : input)
         {
             n.add((dd - MIN) / (MAX-MIN));
-        }
-        return n;
-    }
-
-    private List<Double> standardise(List<Double> input, double mean, double sd)
-    {
-        List<Double> n = new ArrayList<>();
-        for(Double dd : input)
-        {
-            n.add((dd - mean) / sd);
         }
         return n;
     }
@@ -138,8 +113,9 @@ public class Counter {
         }
 
         diff_queue.add(diff_sum);
+        //System.out.println(diff_sum);
 
-        queue.remove();
+        queue.remove(0);
         if(diff_queue.size() > 60) {
             diff_queue.remove(0);
         }
@@ -149,10 +125,10 @@ public class Counter {
         {
             double test = diff_queue.get(index);
             List<Double> subset = diff_queue.subList(index-15, index+15);
-            if(test == Collections.max(subset)) {
+            //if(test == Collections.max(subset) && test - Collections.min(subset) > 5) {
                 count++;
-                System.out.println(count);
-            }
+                System.out.println(incoming_count+","+count);
+            //}
         }
     }
 

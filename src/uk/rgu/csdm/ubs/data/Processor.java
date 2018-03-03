@@ -1,9 +1,7 @@
 package uk.rgu.csdm.ubs.data;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,7 +85,7 @@ public class Processor
     System.arraycopy(frame1, 0, newFrame, 0, frame1.length);
     System.arraycopy(frame2, 0, newFrame, frame1.length, frame2.length);
 
-    Counter.getInstance().add(convert(newFrame));
+    DTWCounter.getInstance().add(convert(newFrame));
     newFrame = upsample(newFrame, 5);
     return newFrame;
   }
