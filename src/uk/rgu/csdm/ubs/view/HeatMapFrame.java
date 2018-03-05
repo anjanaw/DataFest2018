@@ -1,5 +1,9 @@
 package uk.rgu.csdm.ubs.view;
 
+import uk.rgu.csdm.ubs.data.CountChangeListener;
+import uk.rgu.csdm.ubs.data.Counter;
+import uk.rgu.csdm.ubs.data.Processor;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,81 +13,27 @@ public class HeatMapFrame extends JFrame
 {
   private HeatMap heatMap;
 
-  private JMenuBar menuBar;
-
-  private JMenu menu;
-
-  private JMenuItem fullScreen;
-
-  private JMenuItem configure;
-
-  private JMenuItem exit;
+  private ConfigPanel configPanel;
 
   public HeatMapFrame() throws Exception
   {
     super("Pressure Mat");
-
+    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     this.heatMap = new HeatMap();
 
-    this.menu = new JMenu("Preferences");
-    this.fullScreen = new JMenuItem("Enter full screen");
-    this.fullScreen.addActionListener(new ActionListener()
-    {
-      @Override public void actionPerformed(ActionEvent e)
-      {
-        enterFullScreen();
-      }
-    });
-    this.configure = new JMenuItem("Configuration");
-    this.configure.addActionListener(new ActionListener()
-    {
-      @Override public void actionPerformed(ActionEvent e)
-      {
-        configure();
-      }
-    });
-    this.exit = new JMenuItem("Exit");
-    this.exit.addActionListener(new ActionListener()
-    {
-      @Override public void actionPerformed(ActionEvent e)
-      {
-        exit();
-      }
-    });
+    this.getContentPane().setLayout(new GridBagLayout());
+    this.getContentPane().add(heatMap, new GridBagConstraints(0, 0, 1, 2, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-    this.menu.add(configure);
-    this.menu.add(fullScreen);
-    this.menu.add(exit);
+    this.configPanel = new ConfigPanel();
+    this.getContentPane().add(configPanel, new GridBagConstraints(1, 0, 1, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 
-    this.menuBar = new JMenuBar();
-    this.menuBar.add(menu);
-
-    this.setJMenuBar(menuBar);
-
-    this.getContentPane().add(heatMap, BorderLayout.CENTER);
   }
 
   public void setData()
   {
+    this.configPanel.setData(this);
     this.heatMap.setConfigData(null);
-  }
-
-  private void enterFullScreen()
-  {
-    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-    this.setVisible(true);
-  }
-
-  private void configure()
-  {
-    ConfigDialog instance = ConfigDialog.getInstance();
-    instance.setParent(this);
-    instance.showDialog();
-  }
-
-  private void exit()
-  {
-    dispose();
+    Counter.getInstance().setListener(this.configPanel);
   }
 
   public HeatMap getHeatMap()

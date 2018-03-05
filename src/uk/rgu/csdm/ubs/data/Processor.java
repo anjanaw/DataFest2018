@@ -1,5 +1,6 @@
 package uk.rgu.csdm.ubs.data;
 
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -25,7 +26,7 @@ public class Processor
 
   private static final String SPACE = " ";
 
-  private static final String FILE = "C:/IdeaProjects/1210.csv";
+  private static final String FILE = "/Users/anjana/IdeaProjects/PressureMat/1210.csv";
 
   private static final double THRESHOLD = 4095;
 

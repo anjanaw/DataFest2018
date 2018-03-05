@@ -3,6 +3,7 @@ package uk.rgu.csdm.ubs.tts;
 import javax.sound.sampled.*;
 import java.io.File;
 
+import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
 import com.darkprograms.speech.recognizer.Languages;
 import net.sourceforge.javaflacencoder.FLACFileWriter;
 
@@ -10,71 +11,67 @@ import com.darkprograms.speech.microphone.Microphone;
 import com.darkprograms.speech.recognizer.Recognizer;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 
-/**
- * Jarvis Speech API Tutorial
- * @author Aaron Gokaslan (Skylion)
- *
- */
 public class STT
 {
+  private static STT instance;
 
-  public static void main(String[] args)
+  private STT()
   {
 
-    AudioFileFormat.Type[] typeArray = AudioSystem.getAudioFileTypes();
-    for (AudioFileFormat.Type type : typeArray)
-    {
-      System.out.println("type: " + type.toString());
-    }
+  }
 
-    Microphone mic = new Microphone(FLACFileWriter.FLAC);
-    File file = new File("/Users/anjana/IdeaProjects/PressureMat/testfile2.flac");
-    try
+  public static STT getInstance()
+  {
+    if(instance == null)
     {
-      mic.captureAudioToFile(file);
+      instance = new STT();
     }
-    catch (Exception ex)
-    {
-      System.out.println("ERROR: Microphone is not availible.");
-      ex.printStackTrace();
-    }
+    return instance;
+  }
 
-    try
+  public void listen()
+  {
+    MicrophoneAnalyzer mic = new MicrophoneAnalyzer(FLACFileWriter.FLAC);
+    mic.setAudioFile(new File("AudioTestNow.flac"));
+    while (true)
     {
-      System.out.println("Recording...");
-      Thread.sleep(5000);
-      mic.close();
-    }
-    catch (InterruptedException ex)
-    {
-      ex.printStackTrace();
-    }
-
-    mic.close();
-    System.out.println("Recording stopped.");
-
-    Recognizer recognizer = new Recognizer(Languages.ENGLISH_UK, "AIzaSyBeU4Bi2dq4AXYLxYMkk_j3c4BuONTaySQ");
-    try
-    {
-      int maxNumOfResponses = 1;
-      System.out.println("Sample rate is: " + (int) mic.getAudioFormat().getSampleRate());
-      GoogleResponse response = recognizer
-          .getRecognizedDataForFlac(file, maxNumOfResponses, (int) mic.getAudioFormat().getSampleRate());
-      System.out.println("Google Response: " + response.getResponse());
-      System.out
-          .println("Google is " + Double.parseDouble(response.getConfidence()) * 100 + "% confident in" + " the reply");
-      System.out.println("Other Possible responses are: ");
-      for (String s : response.getOtherPossibleResponses())
+      mic.open();
+      final int THRESHOLD = 8;
+      int volume = mic.getAudioVolume();
+      boolean isSpeaking = (volume > THRESHOLD);
+      if (isSpeaking)
       {
-        System.out.println("\t" + s);
+        try
+        {
+          System.out.println("RECORDING...");
+          mic.captureAudioToFile(mic.getAudioFile());
+          do
+          {
+            Thread.sleep(2000);
+          }
+          while (mic.getAudioVolume() > THRESHOLD);
+          System.out.println("Recording Complete!");
+          System.out.println("Recognizing...");
+          Recognizer rec = new Recognizer(Languages.ENGLISH_UK, "AIzaSyBeU4Bi2dq4AXYLxYMkk_j3c4BuONTaySQ");
+          GoogleResponse response = rec.getRecognizedDataForFlac(mic.getAudioFile(), 1, (int) mic.getAudioFormat().getSampleRate());
+          if(response.getResponse().contains("stop"))
+          {
+
+          }
+          else if (response.getResponse().contains("start"))
+          {
+
+          }
+        }
+        catch (Exception e)
+        {
+          e.printStackTrace();
+        }
+        finally
+        {
+          mic.close();
+        }
       }
     }
-    catch (Exception ex)
-    {
-      System.out.println("ERROR: Google cannot be contacted");
-      ex.printStackTrace();
-    }
-
-    file.deleteOnExit();
   }
 }
