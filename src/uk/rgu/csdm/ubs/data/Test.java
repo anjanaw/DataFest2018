@@ -26,7 +26,7 @@ public class Test
                 data.add(item.toArray(new Double[0]));
                 if(data.size() == 32)
                 {
-                    PeakCounter.getInstance().add(data.toArray(new Double[0][]));
+                    PeakRCounter.getInstance().add(data.toArray(new Double[0][]));
                     //Thread.sleep(40);
                     data = new ArrayList<>();
                 }

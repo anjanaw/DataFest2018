@@ -24,7 +24,7 @@ public class Processor
 
   private static final String SPACE = " ";
 
-  private static final String FILE = "/Users/anjana/IdeaProjects/PressureMat/1210.csv";
+  private static final String FILE = "C:/IdeaProjects/PressureMat/1210.csv";
 
   private static final double THRESHOLD = 4095;
 
@@ -86,7 +86,7 @@ public class Processor
     System.arraycopy(frame1, 0, newFrame, 0, frame1.length);
     System.arraycopy(frame2, 0, newFrame, frame1.length, frame2.length);
 
-    DTWCounter.getInstance().add(convert(newFrame));
+    PeakCounter.getInstance().add(convert(newFrame));
     newFrame = upsample(newFrame, 5);
     return newFrame;
   }
@@ -254,5 +254,4 @@ public class Processor
     }
     return newMatrix;
   }
-
 }

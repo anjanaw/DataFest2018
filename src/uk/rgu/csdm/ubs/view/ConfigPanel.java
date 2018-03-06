@@ -34,8 +34,6 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
 
   private JLabel count;
 
-  private JLabel activityStep;
-
   private HeatMapFrame parent;
 
   private BufferedImage image;

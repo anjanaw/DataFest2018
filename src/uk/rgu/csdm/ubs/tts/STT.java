@@ -32,7 +32,7 @@ public class STT
   public void listen()
   {
     MicrophoneAnalyzer mic = new MicrophoneAnalyzer(FLACFileWriter.FLAC);
-    mic.setAudioFile(new File("AudioTestNow.flac"));
+    mic.setAudioFile(new File("../audio.flac"));
     while (true)
     {
       mic.open();

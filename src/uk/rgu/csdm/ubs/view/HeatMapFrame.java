@@ -1,13 +1,8 @@
 package uk.rgu.csdm.ubs.view;
 
-import uk.rgu.csdm.ubs.data.CountChangeListener;
-import uk.rgu.csdm.ubs.data.Counter;
-import uk.rgu.csdm.ubs.data.Processor;
-
+import uk.rgu.csdm.ubs.data.PeakCounter;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class HeatMapFrame extends JFrame
 {
@@ -33,7 +28,7 @@ public class HeatMapFrame extends JFrame
   {
     this.configPanel.setData(this);
     this.heatMap.setConfigData(null);
-    Counter.getInstance().setListener(this.configPanel);
+    PeakCounter.getInstance().setListener(this.configPanel);
   }
 
   public HeatMap getHeatMap()
