@@ -18,7 +18,7 @@ public class ExpandedResWindow extends SearchWindow
    public ExpandedResWindow(TimeSeries tsI, TimeSeries tsJ, PAA shrunkI, PAA shrunkJ,
                             WarpPath shrunkWarpPath, int searchRadius)
    {
-      // Initialize the private data in the super class.
+      // Initialize the private count in the super class.
       super(tsI.size(), tsJ.size());
 
       // Variables to keep track of the current location of the higher resolution projected path.

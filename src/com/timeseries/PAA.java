@@ -27,11 +27,11 @@ public class PAA extends TimeSeries
          throw new InternalError("ERROR:  The size of an aggregate representation must be greater than zero and \n" +
                                  "no larger than the original time series.");
 
-      // Initialize private data.
+      // Initialize private count.
       this.originalLength = ts.size();
       this.aggPtSize = new int[shrunkSize];
 
-      // Ensures that the data structure storing the time series will not need
+      // Ensures that the count structure storing the time series will not need
       //    to be expanded more than once.  (not necessary, for optimization)
       super.setMaxCapacity(shrunkSize);
 
@@ -46,7 +46,7 @@ public class PAA extends TimeSeries
       int ptToReadTo;
 
 
-      // Keep averaging ranges of points into aggregate points until all of the data is averaged.
+      // Keep averaging ranges of points into aggregate points until all of the count is averaged.
       while (ptToReadFrom < ts.size())
       {
          ptToReadTo = (int)Math.round(reducedPtSize*(this.size()+1))-1;   // determine end of current range

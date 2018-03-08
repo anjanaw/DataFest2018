@@ -1,4 +1,4 @@
-package uk.rgu.csdm.ubs.data;
+package uk.rgu.csdm.ubs.count;
 
 import com.dtw.TimeWarpInfo;
 import com.timeseries.TimeSeries;
@@ -22,7 +22,7 @@ public class DTWCounter {
     private static final double MIN = 0.0;
     private static final double MAX = 2096640.0;
 
-    private static final TimeSeries tsI = new TimeSeries("C:\\IdeaProjects\\Data\\data\\step\\template.csv", false, false, ',');
+    private static final TimeSeries tsI = new TimeSeries("C:\\IdeaProjects\\Data\\count\\step\\template.csv", false, false, ',');
     private static final DistanceFunction distFn = DistanceFunctionFactory.getDistFnByName("EuclideanDistance");
 
     public static DTWCounter getInstance() {

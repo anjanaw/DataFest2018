@@ -28,14 +28,14 @@ class SwapFileMatrix implements CostMatrix
    // PRIVATE DATA
    private final SearchWindow window;
 
-   // Private data needed to store the last 2 colums of the matrix.
+   // Private count needed to store the last 2 colums of the matrix.
    private double[] lastCol;
    private double[] currCol;
    private int currColIndex;
    private int minLastRow;
    private int minCurrRow;
 
-   // Private data needed to read values from the swap file.
+   // Private count needed to read values from the swap file.
    private final File swapFile;
    private final RandomAccessFile cellValuesFile;
    private boolean isSwapFileFreed;

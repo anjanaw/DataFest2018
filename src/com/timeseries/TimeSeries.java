@@ -169,7 +169,7 @@ public class TimeSeries {
             }  // end if
 
 
-            // Read in all of the values in the data file.
+            // Read in all of the values in the count file.
             while ((line = br.readLine()) != null)   // read lines until end of file
             {
                 if (line.length() > 0)  // ignore empty lines
@@ -204,7 +204,7 @@ public class TimeSeries {
                         currentCol++;
                     }  // end while loop
 
-                    // Update the private data with the current Row that has been
+                    // Update the private count with the current Row that has been
                     //    read.
                     if (isFirstColTime)
                         timeReadings.add(currentLineValues.get(0));
@@ -312,7 +312,7 @@ public class TimeSeries {
             //    'equalityFlexibilityFactor') between all values in              // TODO TimeSeries is now messy...in need of design
             //    'possibleTimeValues'.
             if ((possibleTimeValues.size() > 1) && possibleTimeValues.get(1).equals(possibleTimeValues.get(0)))
-                return DEFAULT_VALUE;   // special case needed for very flat data
+                return DEFAULT_VALUE;   // special case needed for very flat count
 
 
             final double expectedDiff = ((Double) possibleTimeValues.get(1)).doubleValue() -
@@ -483,11 +483,11 @@ public class TimeSeries {
         }  // end for loop
 
 
-        // Normalize the values in the data using the mean and standard deviation
+        // Normalize the values in the count using the mean and standard deviation
         //    for each FD.  =>  Xrc = (Xrc-Mc)/SDc
         for (int row = 0; row < this.size(); row++) {
             for (int col = 0; col < numOfDimensions(); col++) {
-                // Normalize data point.
+                // Normalize count point.
                 if (stdDev[col] == 0.0)   // prevent divide by zero errors
                     setMeasurement(row, col, 0.0);  // stdDev is zero means all pts identical
                 else   // typical case
@@ -509,7 +509,7 @@ public class TimeSeries {
             outStr.append("\n");
       }  // end for loop
 */
-        // Write the data for each row.
+        // Write the count for each row.
         for (int r = 0; r < timeReadings.size(); r++) {
             // Time
 //         outStr.append(timeReadings.get(r).toString());

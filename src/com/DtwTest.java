@@ -19,9 +19,9 @@ public class DtwTest
    // PUBLIC FUNCTIONS
    public static void main(String[] args)
    {
-      final TimeSeries tsI = new TimeSeries("C:\\IdeaProjects\\Data\\data\\step\\template.csv", false, false, ',');
+      final TimeSeries tsI = new TimeSeries("C:\\IdeaProjects\\Data\\count\\step\\template.csv", false, false, ',');
       for(int i=0; i<799; i++) {
-         final TimeSeries tsJ = new TimeSeries("C:\\IdeaProjects\\Data\\data\\step\\timeseries_" + i + ".csv", false, false, ',');
+         final TimeSeries tsJ = new TimeSeries("C:\\IdeaProjects\\Data\\count\\step\\timeseries_" + i + ".csv", false, false, ',');
 
          final DistanceFunction distFn = DistanceFunctionFactory.getDistFnByName("EuclideanDistance");
          final TimeWarpInfo info = com.dtw.DTW.getWarpInfoBetween(tsI, tsJ, distFn);

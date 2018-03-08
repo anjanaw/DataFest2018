@@ -1,11 +1,12 @@
-package uk.rgu.csdm.ubs.data;
+package uk.rgu.csdm.ubs.count;
 
-import uk.rgu.csdm.ubs.tts.TTS;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import java.util.*;
-
-public class PeakCounter {
-    private static PeakCounter instance;
+public class PeakRCounter {
+    private static PeakRCounter instance;
 
     private static List<Double[][]> queue = new LinkedList<>();
     private static int count = 0;
@@ -16,10 +17,14 @@ public class PeakCounter {
 
     private static List<Double> diff_queue = new ArrayList<>();
 
+    private static double match_diff;
+
     private static final double MIN = 0.0;
     private static final double MAX = 2096640.0;
 
     private CountChangeListener listener;
+
+    private static int first_three = 0;
 
     private static final double[] n_template = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0009691697191697192,0.003081597222222222,
             0.005934733669108669,0,0,0.004454746642246642,0,0,0.004524858821733822,0.004507688492063492,0,0.004072229853479854,0.008112026862026863,
@@ -28,15 +33,15 @@ public class PeakCounter {
             0.008794070512820513,0.004516750610500611,0.003415941697191697,0.004768582112332113,0.0021537507631257631,0.002768582112332113,
             0.0011537507631257631,0};
 
-    public static PeakCounter getInstance()
+    public static PeakRCounter getInstance()
     {
         if (instance == null) {
-            instance = new PeakCounter();
+            instance = new PeakRCounter();
         }
         return instance;
     }
 
-    private PeakCounter()
+    private PeakRCounter()
     {
         for(int i=0; i<59; i++)
         {
@@ -84,6 +89,16 @@ public class PeakCounter {
         return n;
     }
 
+    private double getManhatten(double frame, double template)
+    {
+        return Math.abs(frame - template);
+    }
+
+    private double getEuclidean(double frame, double template, double power)
+    {
+        return Math.pow(frame - template, power);
+    }
+
     private void count()
     {
         List<Double> sums = new ArrayList<>();
@@ -107,7 +122,8 @@ public class PeakCounter {
         double diff_sum = 0;
         for (int i = 0; i < n_sums.size(); i++)
         {
-            double diff = Math.abs(n_sums.get(i) - n_template[i]);
+            //double diff = getManhatten(n_sums.get(i), n_template[i]);
+            double diff = getEuclidean(n_sums.get(i), n_template[i], 2);
             diff_list.add(diff);
             diff_sum+=diff;
         }
@@ -125,13 +141,42 @@ public class PeakCounter {
         {
             double test = diff_queue.get(index);
             List<Double> subset = diff_queue.subList(index-15, index+15);
+            double avg = getAverage(subset);
             if(test == Collections.min(subset))
             {
-                count++;
-                //TTS.getInstance().speak(""+count);
-                System.out.println(count);
+                if(first_three < 3)
+                {
+                    match_diff += avg - test;
+                    count++;
+                    first_three++;
+                    //TTS.getInstance().speak(""+count);
+                    System.out.println(avg+","+test+","+incoming_count+","+count);
+                }
+                else if(first_three++ == 3)
+                {
+                    match_diff = match_diff/3;
+                    count++;
+                    //TTS.getInstance().speak(""+count);
+                    System.out.println(avg+","+test+","+incoming_count+","+count);
+                }
+                else if(avg-test > match_diff/2)
+                {
+                    count++;
+                    //TTS.getInstance().speak(""+count);
+                    System.out.println(avg+","+test+","+incoming_count+","+count);
+                }
             }
         }
+    }
+
+    private double getAverage(List<Double> list)
+    {
+        double sum = 0;
+        for(Double temp : list)
+        {
+            sum +=temp;
+        }
+        return sum/list.size();
     }
 
 

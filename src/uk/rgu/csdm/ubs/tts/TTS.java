@@ -44,4 +44,9 @@ public class TTS
 
   }
 
+  public static final void main(String[] args)
+  {
+    TTS.getInstance().speak("one");
+  }
+
 }

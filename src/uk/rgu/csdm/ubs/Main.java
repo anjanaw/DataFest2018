@@ -1,11 +1,17 @@
 package uk.rgu.csdm.ubs;
 
+import uk.rgu.csdm.ubs.server.Server;
 import uk.rgu.csdm.ubs.view.HeatMapFrame;
 
 import javax.swing.*;
 
 public class Main
 {
+  private static void startListening()
+  {
+    Server.startListening(4343);
+    Server.startListening(4344);
+  }
 
   private static void createAndShowGUI() throws Exception
   {
@@ -18,6 +24,7 @@ public class Main
 
   public static void main(String[] args)
   {
+    startListening();
     Runnable runny = () ->
     {
       try

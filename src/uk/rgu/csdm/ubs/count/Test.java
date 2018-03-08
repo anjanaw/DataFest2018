@@ -1,4 +1,4 @@
-package uk.rgu.csdm.ubs.data;
+package uk.rgu.csdm.ubs.count;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,7 +12,7 @@ public class Test
         BufferedReader br;
         try
         {
-            br = new BufferedReader(new FileReader("C:/IdeaProjects/Data/data/step/19021620201803011146.csv"));
+            br = new BufferedReader(new FileReader("C:/IdeaProjects/Data/count/step/060320181759.csv"));
             String line;
             List<Double[]> data = new ArrayList<>();
             while ((line = br.readLine()) != null)

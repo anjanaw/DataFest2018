@@ -1,8 +1,8 @@
 package uk.rgu.csdm.ubs.view;
 
 import jssc.SerialPortList;
-import uk.rgu.csdm.ubs.data.CountChangeListener;
-import uk.rgu.csdm.ubs.data.Processor;
+import uk.rgu.csdm.ubs.count.CountChangeListener;
+import uk.rgu.csdm.ubs.tts.VoiceListener;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ConfigPanel extends JPanel implements Constants, CountChangeListener
+public class ConfigPanel extends JPanel implements Constants, CountChangeListener, VoiceListener
 {
   private Map<String, String> configData;
 
@@ -34,8 +34,6 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
 
   private JLabel count;
 
-  private HeatMapFrame parent;
-
   private BufferedImage image;
 
   private JPanel imagePanel;
@@ -44,12 +42,25 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
   {
     super();
     init();
+    setData();
   }
 
   @Override public void countChanged(int count)
   {
     this.count.setText(""+count);
     this.repaint();
+  }
+
+  @Override
+  public void changed(String voice) {
+    if(voice.equals("start"))
+    {
+      start();
+    }
+    else if(voice.equals("stop"))
+    {
+      stop();
+    }
   }
 
   private void init()
@@ -104,7 +115,6 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
     };
     this.imagePanel.setBackground(Color.white);
 
-
     this.add(imagePanel,
         new GridBagConstraints(0, 0, 2, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
             new Insets(5, 5, 5, 5), 0, 0));
@@ -135,31 +145,14 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
         new Insets(5, 5, 5, 5), 0, 0));
   }
 
-  public void setData(HeatMapFrame parent)
+  private void setData()
   {
-    this.parent = parent;
-    this.configData = parent.getHeatMap().getConfigData();
     String[] ports = createComboModel(SerialPortList.getPortNames());
     this.leftCombo.setModel(new DefaultComboBoxModel<String>(ports));
     this.rightCombo.setModel(new DefaultComboBoxModel<String>(ports));
-
-    if (configData.size() != 0)
-    {
-      boolean isoff = !Boolean.parseBoolean(configData.get(IS_ON));
-      this.leftCombo.setSelectedItem(configData.get(LEFT_PORT));
-      this.rightCombo.setSelectedItem(configData.get(RIGHT_PORT));
-      this.leftCombo.setEnabled(isoff);
-      this.rightCombo.setEnabled(isoff);
-      this.startButton.setEnabled(isoff);
-      this.stopButton.setEnabled(!isoff);
-    }
-    else
-    {
-      this.rightCombo.setSelectedIndex(0);
-      this.leftCombo.setSelectedIndex(0);
-      this.stopButton.setEnabled(false);
-      this.startButton.setEnabled(true);
-    }
+    this.rightCombo.setSelectedIndex(0);
+    this.leftCombo.setSelectedIndex(0);
+    setStatus(false);
   }
 
   private String[] createComboModel(String[] portnames)
@@ -182,21 +175,19 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
       this.configData.put(LEFT_PORT, (String) leftCombo.getSelectedItem());
       this.configData.put(RIGHT_PORT, (String) rightCombo.getSelectedItem());
       this.configData.put(IS_ON, Boolean.toString(true));
-      this.parent.getHeatMap().setConfigData(this.configData);
-      this.setVisible(false);
+      setStatus(true);
     }
   }
 
   private void stop()
   {
     this.configData.put(IS_ON, Boolean.toString(false));
-    this.parent.getHeatMap().setConfigData(this.configData);
-    this.setVisible(false);
+    setStatus(false);
   }
 
-  public Map<String, String> getConfigData()
+  private void setStatus(boolean isOn)
   {
-    return configData;
+    this.startButton.setEnabled(!isOn);
+    this.stopButton.setEnabled(isOn);
   }
-
 }
