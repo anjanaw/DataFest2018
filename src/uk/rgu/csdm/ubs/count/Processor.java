@@ -1,31 +1,18 @@
 package uk.rgu.csdm.ubs.count;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import uk.rgu.csdm.ubs.view.DataReadyListener;
+
+import java.util.*;
 
 public class Processor
 {
   private static Processor instance;
 
-  private static final String START_FRAME = "48 00 0A ";
+  private List<Double[][]> leftData = new ArrayList<>();
 
-  private static final String START_ROW = "4D ";
+  private List<Double[][]> rightData = new ArrayList<>();
 
-  private static final String END_ROW = "0A ";
-
-  private static final String EMPTY = "";
-
-  private static final String[] ROWS = { "10 00 ", "10 01 ", "10 02 ", "10 03 ", "10 04 ", "10 05 ", "10 06 ", "10 07 ",
-      "10 08 ", "10 09 ", "10 0A ", "10 0B ", "10 0C ", "10 0D ", "10 0E ", "10 0F " };
-
-  private static final String SPACE = " ";
-
-  private static final String FILE = "C:/IdeaProjects/PressureMat/1210.csv";
-
-  private static final double THRESHOLD = 4095;
+  private DataReadyListener listener;
 
   private Processor()
   {
@@ -41,142 +28,74 @@ public class Processor
     return instance;
   }
 
-  public double[][] processFrame()
+  public void setDataReadyListener(DataReadyListener readyListener)
   {
-    try
-    {
-      BufferedReader br = new BufferedReader(new FileReader(FILE));
-      String str;
-      double[][] frame = new double[32][];
-      int j=0;
-      while ((str = br.readLine()) != null)
-      {
-        String[] strr = str.split(",");
-        double[] line = new double[16];
-        int i=0;
-        for(String temp : strr)
-        {
-          line[i++] = Double.parseDouble(temp);
-        }
-        frame[j++] = line;
-        if(j == 32)
-        {
-          frame = upsample(frame, 5);
-          System.out.println(frame[0].length);
-          System.out.println(frame.length);
-          return frame;
-        }
-      }
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
-    return null;
+    this.listener = readyListener;
   }
 
-  public double[][] processFrame(String frameString1, String frameString2)
+  public synchronized  void add(String data, int port)
   {
-    double[][] frame1 = processFrame(frameString1);
-    double[][] frame2 = processFrame(frameString2);
-
-    double[][] newFrame = new double[frame1.length * 2][];
-
-    System.arraycopy(frame1, 0, newFrame, 0, frame1.length);
-    System.arraycopy(frame2, 0, newFrame, frame1.length, frame2.length);
-
-    PeakCounter.getInstance().add(convert(newFrame));
-    newFrame = upsample(newFrame, 5);
-    return newFrame;
+    if(port == 4343)
+    {
+      leftData.add(convert(data));
+    }
+    else
+    {
+      rightData.add(convert(data));
+    }
   }
 
-  private Double[][] convert(double[][] input)
+  public void startProcessing()
   {
-    List<Double[]> output = new ArrayList<>();
-    for(double[] dd : input)
-    {
-      List<Double> o = new ArrayList<>();
-      for(double d:dd)
-      {
-        o.add(d);
-      }
-      output.add(o.toArray(new Double[0]));
+    do {
+
+      Double[][] left = leftData.get(0);
+      Double[][] right = rightData.get(0);
+
+      Double[][] newFrame = new Double[left.length * 2][];
+
+      System.arraycopy(left, 0, newFrame, 0, left.length);
+      System.arraycopy(right, 0, newFrame, left.length, right.length);
+
+      PeakCounter.getInstance().add(newFrame);
+      newFrame = upsample(newFrame, 5);
+      listener.ready(newFrame);
+      leftData.remove(0);
+      rightData.remove(0);
     }
-    return output.toArray(new Double[0][]);
+    while(leftData.size() > 0 && rightData.size() > 0);
   }
 
-  /*private void writeFile(double[][] frame)
+  public void stopProcessing()
   {
-    try
-    {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(FILE, true));
-      for(double[] line : frame)
-      {
-        StringBuilder s = new StringBuilder();
-        for(double temp : line)
-        {
-          s.append(temp);
-          s.append(",");
-        }
-        writer.append(s.toString().substring(0, s.length()-1));
-        writer.append("\n");
-      }
-      writer.close();
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
-  }*/
-
-  public double[][] processFrame(String frameString)
-  {
-    double[][] returnData = new double[16][16];
-    if (frameString != null && frameString.length() == 1737)
-    {
-      frameString = frameString.toUpperCase().replace(START_FRAME, EMPTY);
-      String[] splitFrom4D = frameString.split(START_ROW);
-      if (splitFrom4D.length == 17)
-      {
-        splitFrom4D = Arrays.copyOfRange(splitFrom4D, 1, 17);
-
-        for (int i = 0; i < splitFrom4D.length; i++)
-        {
-          returnData[i] = processRow(splitFrom4D[i].replace(ROWS[i], EMPTY).replace(END_ROW, EMPTY));
-        }
-
-      }
-    }
-    return rotate(returnData);
+    leftData.clear();
+    rightData.clear();
   }
 
-  public double[] processRow(String rowString)
+  private Double[][] convert(String input)
   {
-    double[] row = new double[16];
-    if (rowString.length() == 96)
+    String[] temps = input.split(",");
+    List<Double[]> f = new ArrayList<>();
+    List<Double> r = new ArrayList<>();
+    for(String temp: temps)
     {
-      String[] splitFromSpace = rowString.split(SPACE, -1);
-      if (splitFromSpace.length == 33)
+      r.add(Double.parseDouble(temp));
+      if(r.size() == 16)
       {
-        splitFromSpace = Arrays.copyOfRange(splitFromSpace, 0, 32);
-        int column = 0;
-        for (int i = 1; i < splitFromSpace.length; i += 2)
-        {
-          String value = splitFromSpace[i] + splitFromSpace[i - 1];
-          row[column++] = THRESHOLD - Long.parseLong(value, 16);
-        }
+        f.add(r.toArray(new Double[16]));
+        r = new ArrayList<>();
       }
     }
-    return row;
+    return f.toArray(new Double[16][16]);
   }
 
-  public double[][] upsample(double[][] matrix, int times)
+  public Double[][] upsample(Double[][] matrix, int times)
   {
     for (int k = 0; k < times; k++)
     {
       int newi = matrix.length * 2;
       int newj = matrix[0].length * 2;
-      double[][] upsampledMatrix = new double[newi][newj];
+      Double[][] upsampledMatrix = new Double[newi][newj];
 
       for (int i = 0; i < newi; i++)
       {

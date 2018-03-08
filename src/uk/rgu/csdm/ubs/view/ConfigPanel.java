@@ -2,6 +2,8 @@ package uk.rgu.csdm.ubs.view;
 
 import jssc.SerialPortList;
 import uk.rgu.csdm.ubs.count.CountChangeListener;
+import uk.rgu.csdm.ubs.count.Processor;
+import uk.rgu.csdm.ubs.server.Server;
 import uk.rgu.csdm.ubs.tts.VoiceListener;
 
 import javax.imageio.ImageIO;
@@ -176,6 +178,8 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
       this.configData.put(RIGHT_PORT, (String) rightCombo.getSelectedItem());
       this.configData.put(IS_ON, Boolean.toString(true));
       setStatus(true);
+      Server.doProcess = true;
+      Processor.getInstance().startProcessing();
     }
   }
 
@@ -183,6 +187,8 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
   {
     this.configData.put(IS_ON, Boolean.toString(false));
     setStatus(false);
+    Server.doProcess = false;
+    Processor.getInstance().stopProcessing();
   }
 
   private void setStatus(boolean isOn)

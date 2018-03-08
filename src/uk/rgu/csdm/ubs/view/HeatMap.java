@@ -6,9 +6,9 @@ import java.text.DecimalFormat;
 
 import javax.swing.*;
 
-public class HeatMap extends JPanel implements Constants
+public class HeatMap extends JPanel implements Constants, DataReadyListener
 {
-  private double[][] data;
+  private Double[][] data;
 
   private int[][] dataColorIndices;
 
@@ -35,7 +35,7 @@ public class HeatMap extends JPanel implements Constants
     super();
 
     updateGradient(Gradient.GRADIENT_GREEN_YELLOW_ORANGE_RED);
-    updateData(new double[1024][512]);
+    updateData(new Double[1024][512]);
 
     this.setPreferredSize(new Dimension(60 + 1024, 60 + 512));
     this.setDoubleBuffered(true);
@@ -97,14 +97,20 @@ public class HeatMap extends JPanel implements Constants
     }
   }
 
+  @Override
+  public void ready(Double[][] frame)
+  {
+    updateData(frame);
+  }
+
   /**
    * Updates the count display, calls drawData() to do the expensive re-drawing
    * of the count plot, and then calls repaint().
    * @param data The count to display, must be a complete array (non-ragged)
    */
-  public void updateData(double[][] data)
+  public void updateData(Double[][] data)
   {
-    this.data = new double[data.length][data[0].length];
+    this.data = new Double[data.length][data[0].length];
     for (int ix = 0; ix < data.length; ix++)
     {
       for (int iy = 0; iy < data[0].length; iy++)

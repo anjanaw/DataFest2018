@@ -1,11 +1,19 @@
 package uk.rgu.csdm.ubs.server;
 
+import uk.rgu.csdm.ubs.count.Processor;
+
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
 
+    public static boolean doProcess = false;
+
+    public static void startListening()
+    {
+
+    }
     public static void startListening(final int port)
     {
         Runnable r = () -> {
@@ -17,9 +25,11 @@ public class Server {
 
     private static void listen(int port)
     {
-        try {
+        try
+        {
             ServerSocket serverSocket = new ServerSocket(port, 5);
-            while(true) {
+            while(true)
+            {
                 Socket socket = serverSocket.accept();
                 InputStream is = socket.getInputStream();
                 byte[] lenBytes = new byte[4];
@@ -29,7 +39,10 @@ public class Server {
                 byte[] receivedBytes = new byte[len];
                 is.read(receivedBytes, 0, len);
                 String received = new String(receivedBytes, 0, len);
-                System.out.println(port+","+received);
+                if(doProcess)
+                {
+                    Processor.getInstance().add(received, port);
+                }
             }
         }
         catch(Exception e)
