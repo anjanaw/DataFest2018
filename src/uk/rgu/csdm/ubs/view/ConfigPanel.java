@@ -3,7 +3,8 @@ package uk.rgu.csdm.ubs.view;
 import jssc.SerialPortList;
 import uk.rgu.csdm.ubs.count.CountChangeListener;
 import uk.rgu.csdm.ubs.count.Processor;
-import uk.rgu.csdm.ubs.server.Server;
+import uk.rgu.csdm.ubs.server.ServerLeft;
+import uk.rgu.csdm.ubs.server.ServerRight;
 import uk.rgu.csdm.ubs.tts.VoiceListener;
 
 import javax.imageio.ImageIO;
@@ -16,12 +17,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class ConfigPanel extends JPanel implements Constants, CountChangeListener, VoiceListener
 {
-  private Map<String, String> configData;
-
   private JLabel leftInput;
 
   private JLabel rightInput;
@@ -76,21 +74,11 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
     this.rightCombo = new JComboBox();
 
     this.startButton = new JButton("Start");
-    this.startButton.addActionListener(new ActionListener()
-    {
-      @Override public void actionPerformed(ActionEvent e)
-      {
-        start();
-      }
-    });
+    ActionListener start = (actionEvent) -> start();
+    this.startButton.addActionListener(start);
     this.stopButton = new JButton("Stop");
-    this.stopButton.addActionListener(new ActionListener()
-    {
-      @Override public void actionPerformed(ActionEvent e)
-      {
-        stop();
-      }
-    });
+    ActionListener stop = (actionEvent) -> stop();
+    this.stopButton.addActionListener(stop);
 
     this.count = new JLabel();
     this.count.setFont(new Font("Serif", Font.PLAIN, 100));
@@ -150,8 +138,8 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
   private void setData()
   {
     String[] ports = createComboModel(SerialPortList.getPortNames());
-    this.leftCombo.setModel(new DefaultComboBoxModel<String>(ports));
-    this.rightCombo.setModel(new DefaultComboBoxModel<String>(ports));
+    this.leftCombo.setModel(new DefaultComboBoxModel<>(ports));
+    this.rightCombo.setModel(new DefaultComboBoxModel<>(ports));
     this.rightCombo.setSelectedIndex(0);
     this.leftCombo.setSelectedIndex(0);
     setStatus(false);
@@ -174,21 +162,19 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
     }
     else
     {
-      this.configData.put(LEFT_PORT, (String) leftCombo.getSelectedItem());
-      this.configData.put(RIGHT_PORT, (String) rightCombo.getSelectedItem());
-      this.configData.put(IS_ON, Boolean.toString(true));
       setStatus(true);
-      Server.doProcess = true;
-      Processor.getInstance().startProcessing();
+      ServerLeft.doProcess = true;
+      ServerRight.doProcess = true;
+      Processor.getInstance().startProcess();
     }
   }
 
   private void stop()
   {
-    this.configData.put(IS_ON, Boolean.toString(false));
     setStatus(false);
-    Server.doProcess = false;
-    Processor.getInstance().stopProcessing();
+    ServerRight.doProcess = false;
+    ServerLeft.doProcess = false;
+    Processor.getInstance().stopProcess();
   }
 
   private void setStatus(boolean isOn)

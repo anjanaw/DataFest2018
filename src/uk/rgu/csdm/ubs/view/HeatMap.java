@@ -35,7 +35,7 @@ public class HeatMap extends JPanel implements Constants, DataReadyListener
     super();
 
     updateGradient(Gradient.GRADIENT_GREEN_YELLOW_ORANGE_RED);
-    updateData(new Double[1024][512]);
+    updateData(empty());
 
     this.setPreferredSize(new Dimension(60 + 1024, 60 + 512));
     this.setDoubleBuffered(true);
@@ -44,6 +44,19 @@ public class HeatMap extends JPanel implements Constants, DataReadyListener
     this.fg = Color.black;
 
     drawData();
+  }
+
+  private Double[][] empty()
+  {
+    Double[][] f = new Double[1024][512];
+    for(int i=0; i<1024; i++)
+    {
+      for(int j=0; j<512; j++)
+      {
+        f[i][j] = 0.0;
+      }
+    }
+    return f;
   }
 
   /**
@@ -98,9 +111,10 @@ public class HeatMap extends JPanel implements Constants, DataReadyListener
   }
 
   @Override
-  public void ready(Double[][] frame)
+  public void ready(final Double[][] frame)
   {
-    updateData(frame);
+    Runnable r = () -> updateData(frame);
+    SwingUtilities.invokeLater(r);
   }
 
   /**

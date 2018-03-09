@@ -8,11 +8,17 @@ public class Processor
 {
   private static Processor instance;
 
-  private List<Double[][]> leftData = new ArrayList<>();
+  private Double[][] leftData = null;
 
-  private List<Double[][]> rightData = new ArrayList<>();
+  private Double[][] rightData = null;
 
   private DataReadyListener listener;
+
+  private static final long WINDOW = 67;
+
+  private Runnable r = () -> process();
+
+  private Thread t = new Thread(r);
 
   private Processor()
   {
@@ -33,43 +39,54 @@ public class Processor
     this.listener = readyListener;
   }
 
-  public synchronized  void add(String data, int port)
+  public  void addLeft(String data)
   {
-    if(port == 4343)
-    {
-      leftData.add(convert(data));
-    }
-    else
-    {
-      rightData.add(convert(data));
-    }
+    leftData = convert(data);
+  }
+  public  void addRight(String data)
+  {
+    rightData = convert(data);
   }
 
-  public void startProcessing()
+  public void startProcess()
   {
-    do {
+    try {
+      Thread.sleep(100);
+    }
+    catch(InterruptedException e)
+    {
+      e.printStackTrace();
+    }
+    t.start();
+  }
 
-      Double[][] left = leftData.get(0);
-      Double[][] right = rightData.get(0);
+  private void process()
+  {
+    while(!Thread.interrupted()) {
+      long start = System.currentTimeMillis();
+      Double[][] newFrame = new Double[leftData.length * 2][];
 
-      Double[][] newFrame = new Double[left.length * 2][];
+      System.arraycopy(leftData, 0, newFrame, 0, leftData.length);
+      System.arraycopy(rightData, 0, newFrame, leftData.length, rightData.length);
 
-      System.arraycopy(left, 0, newFrame, 0, left.length);
-      System.arraycopy(right, 0, newFrame, left.length, right.length);
-
-      PeakCounter.getInstance().add(newFrame);
-      newFrame = upsample(newFrame, 5);
+      PeakRCounter.getInstance().add(newFrame);
+      //newFrame = upsample(newFrame, 5);
       listener.ready(newFrame);
-      leftData.remove(0);
-      rightData.remove(0);
+      long end = System.currentTimeMillis();
+      try
+      {
+        Thread.sleep(WINDOW - (end-start));
+      }
+      catch(Exception e)
+      {
+        e.printStackTrace();
+      }
     }
-    while(leftData.size() > 0 && rightData.size() > 0);
   }
 
-  public void stopProcessing()
+  public void stopProcess()
   {
-    leftData.clear();
-    rightData.clear();
+    t.interrupt();
   }
 
   private Double[][] convert(String input)
@@ -77,16 +94,39 @@ public class Processor
     String[] temps = input.split(",");
     List<Double[]> f = new ArrayList<>();
     List<Double> r = new ArrayList<>();
+    double max = 0;
     for(String temp: temps)
     {
-      r.add(Double.parseDouble(temp));
+      double dd = Double.parseDouble(temp);
+      if(max < dd)
+      {
+        max = dd;
+      }
+      r.add(dd);
       if(r.size() == 16)
       {
         f.add(r.toArray(new Double[16]));
         r = new ArrayList<>();
       }
     }
+    if(max <= 200)
+    {
+      return empty();
+    }
     return f.toArray(new Double[16][16]);
+  }
+
+  private Double[][] empty()
+  {
+    Double[][] f = new Double[32][16];
+    for(int i=0; i<32; i++)
+    {
+      for(int j=0; j<16; j++)
+      {
+        f[i][j] = 0.0;
+      }
+    }
+    return f;
   }
 
   public Double[][] upsample(Double[][] matrix, int times)

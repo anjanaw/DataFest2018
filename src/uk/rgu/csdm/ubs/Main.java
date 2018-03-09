@@ -1,6 +1,7 @@
 package uk.rgu.csdm.ubs;
 
-import uk.rgu.csdm.ubs.server.Server;
+import uk.rgu.csdm.ubs.server.ServerLeft;
+import uk.rgu.csdm.ubs.server.ServerRight;
 import uk.rgu.csdm.ubs.view.HeatMapFrame;
 
 import javax.swing.*;
@@ -9,8 +10,8 @@ public class Main
 {
   private static void startListening()
   {
-    Server.startListening(4343);
-    Server.startListening(4344);
+    ServerRight.startListening();
+    ServerLeft.startListening();
   }
 
   private static void createAndShowGUI() throws Exception
@@ -33,7 +34,6 @@ public class Main
       }
       catch (Exception e)
       {
-        System.err.println(e);
         e.printStackTrace();
       }
     };

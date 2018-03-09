@@ -151,6 +151,7 @@ public class PeakRCounter {
                     first_three++;
                     //TTS.getInstance().speak(""+count);
                     System.out.println(avg+","+test+","+incoming_count+","+count);
+                    listener.countChanged(count);
                 }
                 else if(first_three++ == 3)
                 {
@@ -158,12 +159,14 @@ public class PeakRCounter {
                     count++;
                     //TTS.getInstance().speak(""+count);
                     System.out.println(avg+","+test+","+incoming_count+","+count);
+                    listener.countChanged(count);
                 }
                 else if(avg-test > match_diff/2)
                 {
                     count++;
                     //TTS.getInstance().speak(""+count);
                     System.out.println(avg+","+test+","+incoming_count+","+count);
+                    listener.countChanged(count);
                 }
             }
         }
