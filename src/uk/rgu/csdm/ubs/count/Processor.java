@@ -118,8 +118,8 @@ public class Processor
 
   private Double[][] empty()
   {
-    Double[][] f = new Double[32][16];
-    for(int i=0; i<32; i++)
+    Double[][] f = new Double[16][16];
+    for(int i=0; i<16; i++)
     {
       for(int j=0; j<16; j++)
       {
