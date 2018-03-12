@@ -1,30 +1,32 @@
 package uk.rgu.csdm.ubs.count;
 
+import uk.rgu.csdm.ubs.tts.TTS;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PeakRCounter {
+public class PeakRCounter implements Counter {
     private static PeakRCounter instance;
 
-    private static List<Double[][]> queue = new LinkedList<>();
-    private static int count = 0;
-    private static int incoming_count = 0;
+    private List<Double[][]> queue = new LinkedList<>();
+    private int count = 0;
+    private int incoming_count = 0;
 
     private static final int WINDOW = 60;
     private static final int SMOOTHING_WINDOW = 10;
 
-    private static List<Double> diff_queue = new ArrayList<>();
+    private List<Double> diff_queue = new ArrayList<>();
 
-    private static double match_diff;
+    private double match_diff;
 
     private static final double MIN = 0.0;
     private static final double MAX = 2096640.0;
 
     private CountChangeListener listener;
 
-    private static int first_three = 0;
+    private int first_three = 0;
 
     private static final double[] n_template = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0009691697191697192,0.003081597222222222,
             0.005934733669108669,0,0,0.004454746642246642,0,0,0.004524858821733822,0.004507688492063492,0,0.004072229853479854,0.008112026862026863,
@@ -149,7 +151,7 @@ public class PeakRCounter {
                     match_diff += avg - test;
                     count++;
                     first_three++;
-                    //TTS.getInstance().speak(""+count);
+                    TTS.getInstance().speak(""+count);
                     System.out.println(avg+","+test+","+incoming_count+","+count);
                     listener.countChanged(count);
                 }
@@ -157,14 +159,14 @@ public class PeakRCounter {
                 {
                     match_diff = match_diff/3;
                     count++;
-                    //TTS.getInstance().speak(""+count);
+                    TTS.getInstance().speak(""+count);
                     System.out.println(avg+","+test+","+incoming_count+","+count);
                     listener.countChanged(count);
                 }
                 else if(avg-test > match_diff/2)
                 {
                     count++;
-                    //TTS.getInstance().speak(""+count);
+                    TTS.getInstance().speak(""+count);
                     System.out.println(avg+","+test+","+incoming_count+","+count);
                     listener.countChanged(count);
                 }
@@ -182,5 +184,24 @@ public class PeakRCounter {
         return sum/list.size();
     }
 
+    public int getCount()
+    {
+        return count;
+    }
 
+    public void clear()
+    {
+        this.queue.clear();
+        for(int i=0; i<59; i++)
+        {
+            queue.add(empty());
+        }
+        count = 0;
+        listener.countChanged(count);
+        incoming_count = 0;
+        diff_queue.clear();
+
+        match_diff = 0;
+        int first_three = 0;
+    }
 }

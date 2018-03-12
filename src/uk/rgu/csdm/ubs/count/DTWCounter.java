@@ -8,7 +8,7 @@ import com.util.DistanceFunctionFactory;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DTWCounter {
+public class DTWCounter implements Counter {
     private static DTWCounter instance;
 
     private static List<Double[][]> incoming_queue = new LinkedList<>();
@@ -98,6 +98,16 @@ public class DTWCounter {
                 distance_queue.clear();
             }
         }
+    }
+
+    public int getCount()
+    {
+        return count;
+    }
+
+    public void clear()
+    {
+
     }
 
 }

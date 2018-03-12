@@ -12,7 +12,7 @@ public class Test
         BufferedReader br;
         try
         {
-            br = new BufferedReader(new FileReader("C:/IdeaProjects/Data/count/step/060320181759.csv"));
+            br = new BufferedReader(new FileReader("C:/IdeaProjects/Data/count/step/1445_1.csv"));
             String line;
             List<Double[]> data = new ArrayList<>();
             while ((line = br.readLine()) != null)

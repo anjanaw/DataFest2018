@@ -2,7 +2,7 @@ package uk.rgu.csdm.ubs.count;
 
 import java.util.*;
 
-public class PeakCounter {
+public class PeakCounter implements Counter {
     private static PeakCounter instance;
 
     private static List<Double[][]> queue = new LinkedList<>();
@@ -132,5 +132,14 @@ public class PeakCounter {
         }
     }
 
+    public int getCount()
+    {
+        return count;
+    }
+
+    public void clear()
+    {
+
+    }
 
 }

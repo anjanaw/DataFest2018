@@ -113,7 +113,9 @@ public class HeatMap extends JPanel implements Constants, DataReadyListener
   @Override
   public void ready(final Double[][] frame)
   {
-    Runnable r = () -> updateData(frame);
+    Runnable r = () -> {
+      updateData(frame);
+    };
     SwingUtilities.invokeLater(r);
   }
 

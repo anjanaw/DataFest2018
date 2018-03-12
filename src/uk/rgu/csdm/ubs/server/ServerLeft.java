@@ -14,7 +14,9 @@ public class ServerLeft {
 
     public static void startListening()
     {
-        Runnable r = () -> listen();
+        Runnable r = () -> {
+            listen();
+        };
         Thread t = new Thread(r);
         t.start();
     }

@@ -1,10 +1,10 @@
 package uk.rgu.csdm.ubs.view;
 
-import jssc.SerialPortList;
 import uk.rgu.csdm.ubs.count.CountChangeListener;
 import uk.rgu.csdm.ubs.count.Processor;
 import uk.rgu.csdm.ubs.server.ServerLeft;
 import uk.rgu.csdm.ubs.server.ServerRight;
+import uk.rgu.csdm.ubs.tts.TTS;
 import uk.rgu.csdm.ubs.tts.VoiceListener;
 
 import javax.imageio.ImageIO;
@@ -14,23 +14,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
 
 public class ConfigPanel extends JPanel implements Constants, CountChangeListener, VoiceListener
 {
-  private JLabel leftInput;
-
-  private JLabel rightInput;
-
   private JButton startButton;
 
   private JButton stopButton;
-
-  private JComboBox leftCombo;
-
-  private JComboBox rightCombo;
 
   private JLabel count;
 
@@ -67,21 +56,26 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
   {
     this.setLayout(new GridBagLayout());
     this.setBackground(Color.white);
-    this.leftInput = new JLabel("Left input:");
-    this.rightInput = new JLabel("Right input:");
-
-    this.leftCombo = new JComboBox();
-    this.rightCombo = new JComboBox();
 
     this.startButton = new JButton("Start");
-    ActionListener start = (actionEvent) -> start();
-    this.startButton.addActionListener(start);
+    this.startButton.addActionListener(new ActionListener()
+    {
+      @Override public void actionPerformed(ActionEvent e)
+      {
+        start();
+      }
+    });
     this.stopButton = new JButton("Stop");
-    ActionListener stop = (actionEvent) -> stop();
-    this.stopButton.addActionListener(stop);
+    this.stopButton.addActionListener(new ActionListener()
+    {
+      @Override public void actionPerformed(ActionEvent e)
+      {
+        stop();
+      }
+    });
 
     this.count = new JLabel();
-    this.count.setFont(new Font("Serif", Font.PLAIN, 100));
+    this.count.setFont(new Font("Serif", Font.PLAIN, 110));
     this.count.setText("0");
 
     this.imagePanel = new JPanel()
@@ -109,22 +103,6 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
         new GridBagConstraints(0, 0, 2, 1, 0.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
             new Insets(5, 5, 5, 5), 0, 0));
 
-    this.add(leftInput,
-        new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
-            new Insets(5, 5, 5, 5), 0, 0));
-
-    this.add(leftCombo,
-        new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
-            new Insets(5, 5, 5, 5), 0, 0));
-
-    this.add(rightInput,
-        new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
-            new Insets(5, 5, 5, 5), 0, 0));
-
-    this.add(rightCombo,
-        new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
-            new Insets(5, 5, 5, 5), 0, 0));
-
     this.add(startButton, new GridBagConstraints(0, 3, 1, 1, 0.5, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
         new Insets(5, 5, 5, 5), 0, 0));
 
@@ -137,44 +115,26 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
 
   private void setData()
   {
-    String[] ports = createComboModel(SerialPortList.getPortNames());
-    this.leftCombo.setModel(new DefaultComboBoxModel<>(ports));
-    this.rightCombo.setModel(new DefaultComboBoxModel<>(ports));
-    this.rightCombo.setSelectedIndex(0);
-    this.leftCombo.setSelectedIndex(0);
     setStatus(false);
-  }
-
-  private String[] createComboModel(String[] portnames)
-  {
-    List<String> list = new ArrayList();
-    list.add(SELECT);
-    list.addAll(Arrays.asList(portnames));
-
-    return list.toArray(new String[list.size()]);
   }
 
   private void start()
   {
-    if (this.leftCombo.getSelectedIndex() == 0 || this.rightCombo.getSelectedIndex() == 0)
-    {
-      JOptionPane.showMessageDialog(this, "Please select all inputs!", "Error", JOptionPane.ERROR_MESSAGE);
-    }
-    else
-    {
-      setStatus(true);
-      ServerLeft.doProcess = true;
-      ServerRight.doProcess = true;
-      Processor.getInstance().startProcess();
-    }
+    setStatus(true);
+    ServerLeft.doProcess = true;
+    ServerRight.doProcess = true;
+    TTS.getInstance().sayStartingBit();
+    Processor.getInstance().startProcess();
   }
 
   private void stop()
   {
     setStatus(false);
+    Processor.getInstance().stopProcess();
     ServerRight.doProcess = false;
     ServerLeft.doProcess = false;
-    Processor.getInstance().stopProcess();
+    TTS.getInstance().sayEndingBit();
+    Processor.getInstance().clear();
   }
 
   private void setStatus(boolean isOn)

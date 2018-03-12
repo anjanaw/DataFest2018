@@ -2,6 +2,8 @@ package uk.rgu.csdm.ubs.count;
 
 import uk.rgu.csdm.ubs.view.DataReadyListener;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.*;
 
 public class Processor
@@ -19,6 +21,12 @@ public class Processor
   private Runnable r = () -> process();
 
   private Thread t = new Thread(r);
+
+  private Counter counter = PeakRCounter.getInstance();
+
+  private long startTT = 0;
+
+  private long endTT = 0;
 
   private Processor()
   {
@@ -50,6 +58,7 @@ public class Processor
 
   public void startProcess()
   {
+    startTT = System.currentTimeMillis();
     try {
       Thread.sleep(100);
     }
@@ -69,7 +78,8 @@ public class Processor
       System.arraycopy(leftData, 0, newFrame, 0, leftData.length);
       System.arraycopy(rightData, 0, newFrame, leftData.length, rightData.length);
 
-      PeakRCounter.getInstance().add(newFrame);
+      counter.add(newFrame);
+      write(newFrame);
       //newFrame = upsample(newFrame, 5);
       listener.ready(newFrame);
       long end = System.currentTimeMillis();
@@ -87,6 +97,34 @@ public class Processor
   public void stopProcess()
   {
     t.interrupt();
+    endTT = System.currentTimeMillis();
+  }
+
+  private void write(final Double[][] frame) {
+    Thread t = new Thread(() -> {
+      try {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("C:/Shared/PressureMat/images/1445.csv", true));
+        for (Double[] line : frame) {
+          StringBuilder s = new StringBuilder();
+          for (Double temp : line) {
+            s.append(temp.doubleValue());
+            s.append(",");
+          }
+          writer.append(s.toString().substring(0, s.length() - 1));
+          writer.append("\n");
+        }
+        writer.close();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+    t.start();
+  }
+  public void clear()
+  {
+    this.leftData = null;
+    this.rightData = null;
+    counter.clear();
   }
 
   private Double[][] convert(String input)
@@ -211,5 +249,15 @@ public class Processor
       }
     }
     return newMatrix;
+  }
+
+  public int getCount()
+  {
+    return counter.getCount();
+  }
+
+  public int getSeconds()
+  {
+    return (int)((endTT - startTT)/1000);
   }
 }

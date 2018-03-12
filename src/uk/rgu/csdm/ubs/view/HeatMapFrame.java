@@ -3,6 +3,7 @@ package uk.rgu.csdm.ubs.view;
 import uk.rgu.csdm.ubs.count.PeakRCounter;
 import uk.rgu.csdm.ubs.count.Processor;
 import uk.rgu.csdm.ubs.tts.STT;
+import uk.rgu.csdm.ubs.tts.TTS;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,15 +30,6 @@ public class HeatMapFrame extends JFrame
   public void setData()
   {
     PeakRCounter.getInstance().setListener(this.configPanel);
-    STT.getInstance().setVoiceListner(this.configPanel);
     Processor.getInstance().setDataReadyListener(this.heatMap);
-    /*Thread t = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        STT.getInstance().listen();
-      }
-    });
-    t.start();*/
-
   }
 }
