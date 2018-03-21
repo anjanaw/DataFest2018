@@ -5,6 +5,7 @@ import uk.rgu.csdm.ubs.view.DataReadyListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Processor
 {
@@ -18,19 +19,22 @@ public class Processor
 
   private static final long WINDOW = 67;
 
-  private Runnable r = () -> process();
-
-  private Thread t = new Thread(r);
-
   private Counter counter = PeakRCounter.getInstance();
+
+  private AtomicBoolean isProcess = new AtomicBoolean(false);
 
   private long startTT = 0;
 
   private long endTT = 0;
 
+  private static final String FILE = "C:/Shared/PressureMat/resources/";
+
+  private String currentFile = "";
+
   private Processor()
   {
-
+    Thread t = new Thread(() -> process());
+    t.start();
   }
 
   public static Processor getInstance()
@@ -59,51 +63,54 @@ public class Processor
   public void startProcess()
   {
     startTT = System.currentTimeMillis();
-    try {
-      Thread.sleep(100);
-    }
-    catch(InterruptedException e)
-    {
-      e.printStackTrace();
-    }
-    t.start();
+    isProcess.set(true);
+    currentFile = FILE+startTT+".csv";
   }
 
   private void process()
   {
-    while(!Thread.interrupted()) {
-      long start = System.currentTimeMillis();
-      Double[][] newFrame = new Double[leftData.length * 2][];
+    while(true) {
+      if(isProcess.get()) {
+        long start = System.currentTimeMillis();
+        Double[][] newFrame = new Double[leftData.length * 2][];
 
-      System.arraycopy(leftData, 0, newFrame, 0, leftData.length);
-      System.arraycopy(rightData, 0, newFrame, leftData.length, rightData.length);
+        System.arraycopy(leftData, 0, newFrame, 0, leftData.length);
+        System.arraycopy(rightData, 0, newFrame, leftData.length, rightData.length);
 
-      counter.add(newFrame);
-      write(newFrame);
-      //newFrame = upsample(newFrame, 5);
-      listener.ready(newFrame);
-      long end = System.currentTimeMillis();
-      try
-      {
-        Thread.sleep(WINDOW - (end-start));
+        counter.add(newFrame);
+        write(newFrame);
+        listener.ready(newFrame);
+        long end = System.currentTimeMillis();
+        try {
+          Thread.sleep(WINDOW - (end - start));
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
-      catch(Exception e)
+      else
       {
-        e.printStackTrace();
+        long start = System.currentTimeMillis();
+        listener.ready(empty(16, 32));
+        long end = System.currentTimeMillis();
+        try {
+          Thread.sleep(WINDOW - (end - start));
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
     }
   }
 
   public void stopProcess()
   {
-    t.interrupt();
+    isProcess.set(false);
     endTT = System.currentTimeMillis();
   }
 
   private void write(final Double[][] frame) {
     Thread t = new Thread(() -> {
       try {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("C:/Shared/PressureMat/images/1445.csv", true));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(currentFile, true));
         for (Double[] line : frame) {
           StringBuilder s = new StringBuilder();
           for (Double temp : line) {
@@ -149,17 +156,17 @@ public class Processor
     }
     if(max <= 200)
     {
-      return empty();
+      return empty(16,16);
     }
     return f.toArray(new Double[16][16]);
   }
 
-  private Double[][] empty()
+  private Double[][] empty(int rows, int columns)
   {
-    Double[][] f = new Double[16][16];
-    for(int i=0; i<16; i++)
+    Double[][] f = new Double[columns][rows];
+    for(int i=0; i<columns; i++)
     {
-      for(int j=0; j<16; j++)
+      for(int j=0; j<rows; j++)
       {
         f[i][j] = 0.0;
       }

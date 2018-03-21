@@ -26,12 +26,12 @@ public class TestPeakCounter implements Counter {
 
     private int first_three = 0;
 
-    private static final double[] n_template = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0009691697191697192,0.003081597222222222,
-            0.005934733669108669,0,0,0.004454746642246642,0,0,0.004524858821733822,0.004507688492063492,0,0.004072229853479854,0.008112026862026863,
-            0.01101810515873016,0.0077390491452991456,0.006184657356532356,0.005285599816849817,0.005103880494505495,0.006348252442002442,
-            0.005926625457875458,0.005573202838827839,0.005644745879120879,0.006082112332112332,0.006358268467643468,0.005323756105006105,
-            0.008794070512820513,0.004516750610500611,0.003415941697191697,0.004768582112332113,0.0021537507631257631,0.002768582112332113,
-            0.0011537507631257631,0};
+    private static final double[] n_template_1 = {0.00982458380295,0.00929931113224,0.00896757155772,0.00901889910303,0.00898756692026,0.00897197420635,0.00876534323049,
+            0.00824003387104,0.00755898081619,0.00698223384521,0.00621136675824,0.00531546445008,0.00446468929041,0.00337767534282,0.00228108563445,0.00139017299474,
+            0.00066435967878,0.00044532790927,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.00118288162158,0.00224223226026,
+            0.00340159640039,0.00431360506481,0.00539775729079,0.00581322056683,0.00598382320137,0.00615174755800,0.00631780078895,0.00654666514042,0.00662943493472,
+            0.00671990936414,0.00671741452991,0.00679431412604,0.00709978456373,0.00762116822814,0.00834602763689,0.00840417928759,0.00711706495961,0.00672299121818,
+            0.00484926064854};
 
     public static TestPeakCounter getInstance()
     {
@@ -43,7 +43,7 @@ public class TestPeakCounter implements Counter {
 
     private TestPeakCounter()
     {
-        for(int i=0; i<59; i++)
+        for(int i=0; i<30; i++)
         {
             queue.add(empty());
         }
@@ -133,13 +133,13 @@ public class TestPeakCounter implements Counter {
         for (int i = 0; i < n_sums.size(); i++)
         {
             //double diff = getManhatten(n_sums.get(i), n_template[i]);
-            double diff = getEuclidean(n_sums.get(i), n_template[i], 2);
+            double diff = getEuclidean(n_sums.get(i), n_template_1[i], 2);
             diff_list.add(diff);
             diff_sum+=diff;
         }
 
         diff_queue.add(diff_sum);
-        //System.out.println(diff_sum);
+        System.out.println(diff_sum+","+incoming_count);
 
         queue.remove(0);
         if(diff_queue.size() > 60) {
@@ -161,7 +161,7 @@ public class TestPeakCounter implements Counter {
                     count++;
                     first_three++;
                     //TTS.getInstance().speak(""+count);
-                    System.out.println(avg+","+test+","+incoming_count+","+count);
+                    //System.out.println(avg+","+test+","+incoming_count+","+count);
                     //listener.countChanged(count);
                 }
                 else if(first_three++ == 3)
@@ -169,19 +169,19 @@ public class TestPeakCounter implements Counter {
                     match_diff = match_diff/3;
                     count++;
                     //TTS.getInstance().speak(""+count);
-                    System.out.println(avg+","+test+","+incoming_count+","+count);
+                    //System.out.println(avg+","+test+","+incoming_count+","+count);
                     //listener.countChanged(count);
                 }
                 else if(avg-test > match_diff/2)
                 {
                     count++;
                     //TTS.getInstance().speak(""+count);
-                    System.out.println(avg+","+test+","+incoming_count+","+count);
+                    //System.out.println(avg+","+test+","+incoming_count+","+count);
                     //listener.countChanged(count);
                 }
                 else
                 {
-                    System.out.println(avg+","+test+","+incoming_count+","+count);
+                    //System.out.println(avg+","+test+","+incoming_count+","+count);
                 }
             }
         }
@@ -205,7 +205,7 @@ public class TestPeakCounter implements Counter {
     public void clear()
     {
         this.queue.clear();
-        for(int i=0; i<59; i++)
+        for(int i=0; i<30; i++)
         {
             queue.add(empty());
         }

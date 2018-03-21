@@ -2,8 +2,6 @@ package uk.rgu.csdm.ubs.view;
 
 import uk.rgu.csdm.ubs.count.CountChangeListener;
 import uk.rgu.csdm.ubs.count.Processor;
-import uk.rgu.csdm.ubs.server.ServerLeft;
-import uk.rgu.csdm.ubs.server.ServerRight;
 import uk.rgu.csdm.ubs.tts.TTS;
 import uk.rgu.csdm.ubs.tts.VoiceListener;
 
@@ -76,7 +74,8 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
 
     this.count = new JLabel();
     this.count.setFont(new Font("Serif", Font.PLAIN, 110));
-    this.count.setText("0");
+    this.count.setText("100");
+    this.count.setHorizontalAlignment(SwingConstants.CENTER);
 
     this.imagePanel = new JPanel()
     {
@@ -86,7 +85,7 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
         super.paintComponent(g);
         try
         {
-          image = ImageIO.read(new File("images/step.jpg"));
+          image = ImageIO.read(new File("resources/step.jpg"));
         }
         catch(Exception e)
         {
@@ -109,7 +108,7 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
     this.add(stopButton, new GridBagConstraints(1, 3, 1, 1, 0.5, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
         new Insets(5, 5, 5, 5), 0, 0));
 
-    this.add(count, new GridBagConstraints(0, 4, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+    this.add(count, new GridBagConstraints(0, 4, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
         new Insets(5, 5, 5, 5), 0, 0));
   }
 
@@ -121,9 +120,8 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
   private void start()
   {
     setStatus(true);
-    ServerLeft.doProcess = true;
-    ServerRight.doProcess = true;
     TTS.getInstance().sayStartingBit();
+    //TTS.getInstance().sayHelp();
     Processor.getInstance().startProcess();
   }
 
@@ -131,8 +129,6 @@ public class ConfigPanel extends JPanel implements Constants, CountChangeListene
   {
     setStatus(false);
     Processor.getInstance().stopProcess();
-    ServerRight.doProcess = false;
-    ServerLeft.doProcess = false;
     TTS.getInstance().sayEndingBit();
     Processor.getInstance().clear();
   }

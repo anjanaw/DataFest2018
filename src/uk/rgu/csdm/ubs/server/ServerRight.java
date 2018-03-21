@@ -10,8 +10,6 @@ import java.net.SocketTimeoutException;
 
 public class ServerRight {
 
-    public static boolean doProcess = false;
-
     public static void startListening()
     {
         Runnable r = () -> {
@@ -39,10 +37,7 @@ public class ServerRight {
                     byte[] receivedBytes = new byte[len];
                     is.read(receivedBytes, 0, len);
                     String received = new String(receivedBytes, 0, len);
-                    if(doProcess)
-                    {
-                        Processor.getInstance().addRight(received);
-                    }
+                    Processor.getInstance().addRight(received);
                     is.close();
                     socket.close();
                 }

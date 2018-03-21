@@ -12,7 +12,7 @@ public class Test
         BufferedReader br;
         try
         {
-            br = new BufferedReader(new FileReader("C:\\IdeaProjects\\Data\\data\\step\\1303.csv"));
+            br = new BufferedReader(new FileReader("C:\\IdeaProjects\\Data\\data\\step\\1521216094582.csv"));
             String line;
             List<Double[]> data = new ArrayList<>();
             while ((line = br.readLine()) != null)
@@ -27,6 +27,7 @@ public class Test
                 if(data.size() == 32)
                 {
                     TestPeakCounter.getInstance().add(data.toArray(new Double[0][]));
+                    //Thread.sleep(40);
                     data = new ArrayList<>();
                 }
             }

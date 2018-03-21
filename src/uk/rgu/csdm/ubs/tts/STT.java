@@ -87,6 +87,9 @@ public class STT
 
   public static final void main(String[] args)
   {
-    STT.getInstance().listen();
+    double count = 14;
+    double seconds = 130;
+    double avg = seconds/count;
+    System.out.printf("%.1f", avg);
   }
 }
